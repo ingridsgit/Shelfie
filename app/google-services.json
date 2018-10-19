@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "36283032443",
+    "firebase_url": "https://shelfie-18c58.firebaseio.com",
+    "project_id": "shelfie-18c58",
+    "storage_bucket": "shelfie-18c58.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:36283032443:android:85feec0d13458eaf",
+        "android_client_info": {
+          "package_name": "com.bazzillion.ingrid.shelfie"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "36283032443-rbc3kakjg8cna9jml495dahjvolpta3h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bazzillion.ingrid.shelfie",
+            "certificate_hash": "0e2240debd7388f825eee23a30aab14aa51d1868"
+          }
+        },
+        {
+          "client_id": "36283032443-6chqfllvkdgrcs1i2js17b7jamb2c1e8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3GD0mH6Anp7YEDIq1Fp29GG2F7XqHJ-E"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "36283032443-6chqfllvkdgrcs1i2js17b7jamb2c1e8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
