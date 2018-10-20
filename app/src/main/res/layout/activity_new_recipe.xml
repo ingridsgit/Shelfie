@@ -38,23 +38,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"/>
 
-
-            <TextView
-                android:id="@+id/disclaimer_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/layout_margin"
-                android:background="@color/colorPrimaryLight"
-                android:gravity="center"
-                android:padding="@dimen/layout_margin"
-                android:text="@string/disclaimer" />
-
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/product_list_view"
-                />
-
         </LinearLayout>
 
     </android.support.design.widget.CoordinatorLayout>
