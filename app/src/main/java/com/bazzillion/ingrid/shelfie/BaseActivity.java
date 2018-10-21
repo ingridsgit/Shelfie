@@ -50,6 +50,8 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_ingredient_lookup) {
 
         } else if (id == R.id.nav_settings) {
+            Intent intent = new Intent(getBaseContext(), SettingsActivity.class);
+            startActivity(intent);
 
         }
 

@@ -19,14 +19,68 @@
         <item>Hair mask</item>
     </array>
 
+    <array name="skin_type_entryvalues">
+        <item>REGULAR SKIN</item>
+        <item>DRY SKIN</item>
+        <item>COMBINATION SKIN</item>
+        <item>OILY SKIN</item>
+    </array>
+
+    <array name="skin_type_entries">
+        <item>Regular skin</item>
+        <item>Dry skin</item>
+        <item>Combination skin</item>
+        <item>Oily skin</item>
+    </array>
+
+    <array name="skin_specificities_entryvalues">
+        <item>ACNEIC SKIN</item>
+        <item>MATURE SKIN</item>
+        <item>SAGGING SKIN / CELLULITE</item>
+        <item>ECZEMA</item>
+        <item>PSORIASIS</item>
+        <item>SCARS / STRETCH MARKS</item>
+    </array>
+
+    <array name="skin_specificities_entries">
+        <item>Acneic skin</item>
+        <item>Mature skin</item>
+        <item>Sagging skin / Cellulitis</item>
+        <item>Eczema</item>
+        <item>Psoriasis</item>
+        <item>Scars / Stretch marks</item>
+    </array>
+
+    <array name="hair_type_entryvalues">
+        <item>REGULAR HAIR</item>
+        <item>OILY HAIR</item>
+        <item>DRY HAIR</item>
+    </array>
+
+    <array name="hair_type_entries">
+        <item>Regular hair</item>
+        <item>Oily hair</item>
+        <item>Dry hair</item>
+    </array>
+
+    <string name="skin_type">What\'s your skin type?"</string>
+    <string name="skin_specificities">Does your skin have any specificity?</string>
+    <string name="hair_type">What\'s your hair type?</string>
+    <string name="dandruff_checkbox_preference">Do you have dandruff?</string>
+    <string name="summary_dandruff_on">Yes</string>
+    <string name="summary_dandruff_off">No</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+
     <string name="action_settings">Settings</string>
     <string name="action_new_recipe">New Recipe</string>
     <string name="action_my_recipes">My Recipes</string>
     <string name="action_ingredient_lookup">Ingredient Lookup</string>
-    <string name="title_activity_my_recipes">QUESTCEQUIYA</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
+
+    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_my_recipes">My recipes</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
