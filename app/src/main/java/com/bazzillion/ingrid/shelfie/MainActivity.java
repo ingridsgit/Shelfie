@@ -17,17 +17,24 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 public class MainActivity extends BaseActivity {
     public static final String PRODUCT_TYPE = "product_type";
 
     private ListView productListView;
     private ArrayAdapter<String> productArrayAdapter;
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         super.onCreateDrawer();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference typeReference = databaseReference.child("type");
+
         productArrayAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1,
                 getResources().getStringArray(R.array.product_array));

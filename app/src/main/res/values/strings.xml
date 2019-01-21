@@ -81,6 +81,9 @@
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_my_recipes">My recipes</string>
 
+    <string name="pick_base">Pick your base</string>
+    <string name="pick_add_ons">Pick the add-ons</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

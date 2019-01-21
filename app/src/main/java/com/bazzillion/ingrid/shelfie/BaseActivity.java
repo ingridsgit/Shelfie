@@ -46,7 +46,8 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
             Intent intent = new Intent(getBaseContext(), MyRecipesActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_new_recipe) {
-
+            Intent intent = new Intent(getBaseContext(), MainActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_ingredient_lookup) {
 
         } else if (id == R.id.nav_settings) {
