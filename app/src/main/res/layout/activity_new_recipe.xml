@@ -8,6 +8,7 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
+
     <include layout="@layout/coordinator_layout"
         android:layout_height="match_parent"
         android:layout_width="match_parent"/>
@@ -21,10 +22,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"/>
 
-            <TextView
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/new_recipe_textview"/>
+                android:layout_height="match_parent"
+                android:id="@+id/base_fragment"/>
+
 
         </LinearLayout>
 

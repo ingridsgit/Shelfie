@@ -27,6 +27,11 @@
                 android:id="@+id/recipe_list_view"
                 />
 
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/button"/>
+
         </LinearLayout>
 
     <android.support.design.widget.NavigationView

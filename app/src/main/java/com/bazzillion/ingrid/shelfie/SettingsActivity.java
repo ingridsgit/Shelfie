@@ -1,8 +1,7 @@
 package com.bazzillion.ingrid.shelfie;
-import android.app.Fragment;
 import android.os.Bundle;
 
-public class SettingsActivity extends BaseActivity {
+public class SettingsActivity extends DrawerActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
