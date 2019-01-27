@@ -1,5 +1,6 @@
 package com.bazzillion.ingrid.shelfie;
 
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.google.firebase.database.annotations.Nullable;
 
@@ -7,6 +8,7 @@ import java.util.List;
 
 @IgnoreExtraProperties
 public class Base {
+    @Exclude
     public String name;
     public String description;
     public List<String> primaryIngredients;

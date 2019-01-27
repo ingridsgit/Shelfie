@@ -1,12 +1,17 @@
 package com.bazzillion.ingrid.shelfie.Utils;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.bazzillion.ingrid.shelfie.Base;
+import com.bazzillion.ingrid.shelfie.Ingredient;
 import com.bazzillion.ingrid.shelfie.R;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.opencsv.CSVReader;
 
 import java.io.IOException;
@@ -20,7 +25,7 @@ import java.util.Set;
 
 public class FirebaseDataWriting {
 
-    static final String AQUEOUS_PHASE = "Aqueous phase";
+     static final String AQUEOUS_PHASE = "Aqueous phase";
     static final String CLAY = "Clay";
     static final String COSMETIC_INGREDIENT = "Cosmetic ingredient";
     static final String ESSENTIAL_OIL = "Essential oil";
@@ -112,6 +117,43 @@ public class FirebaseDataWriting {
          Collections.addAll(optionalAddOns, optionalAddOnsArray);
         return new Base(line[1], line[2], primaryIngredients, complusoryAddOns, optionalAddOns, line[6]);
 
+     }
+
+     public static void changeIngredientsIds(){
+         FirebaseDatabase database = FirebaseDatabase.getInstance();
+         final DatabaseReference dbReference = database.getReference();
+        for (int i = 0 ; i < 53 ; i++){
+dbReference.child("Ingredient").child(String.valueOf(i)).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Ingredient ingredient = dataSnapshot.getValue(Ingredient.class);
+                    dbReference.child("Ingredient").child(ingredient.name).setValue(ingredient);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                }
+            });
+            dbReference.child("Ingredient").child(String.valueOf(i)).removeValue();
+        }
+     }
+
+     public static void rectifierBanane(){
+         FirebaseDatabase database = FirebaseDatabase.getInstance();
+         final DatabaseReference dbReference = database.getReference();
+         dbReference.child("Ingredient").child("\"Banana pulp \"").child(" peel").child("ingrid").setValue("essai");
+//                 .addValueEventListener(new ValueEventListener() {
+//             @Override
+//             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                 Ingredient ingredient = dataSnapshot.getValue(Ingredient.class);
+//                 dbReference.child("Ingredient").child("Banana pulp").setValue(ingredient);
+//             }
+//
+//             @Override
+//             public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//             }
+//         });
      }
 
 

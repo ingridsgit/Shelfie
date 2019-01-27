@@ -41,6 +41,7 @@ public class BaseFragment extends Fragment {
     private RecyclerView recyclerView;
     private DatabaseReference dbReference;
     private BaseAdapter baseAdapter;
+    private ValueEventListener valueEventListener;
 
     private OnFragmentInteractionListener mListener;
 
@@ -66,9 +67,9 @@ public class BaseFragment extends Fragment {
 
         if (productType != null){
             FirebaseDatabase database = FirebaseDatabase.getInstance();
-            dbReference = database.getReference();
-            baseAdapter = new BaseAdapter(dbReference);
-            dbReference.child(FIREBASE_KEY_PRODUCT).child(productType).addValueEventListener(new ValueEventListener() {
+            dbReference = database.getReference().child(FIREBASE_KEY_PRODUCT).child(productType);
+            baseAdapter = new BaseAdapter((BaseAdapter.BaseClickHandler) getActivity());
+            valueEventListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     ArrayList<String> valueSet = (ArrayList<String>) dataSnapshot.getValue();
@@ -77,12 +78,11 @@ public class BaseFragment extends Fragment {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                    Toast.makeText(getContext(), databaseError.getMessage(), Toast.LENGTH_LONG).show();
                 }
-            });
 
-
-
+            };
+            dbReference.addValueEventListener(valueEventListener);
         }
 
     }
@@ -96,15 +96,16 @@ public class BaseFragment extends Fragment {
         recyclerView = view.findViewById(R.id.base_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         recyclerView.setAdapter(baseAdapter);
+
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
+//    // TODO: Rename method, update argument and hook method into UI event
+//    public void onButtonPressed(Uri uri) {
+//        if (mListener != null) {
+//            mListener.onFragmentInteraction(uri);
+//        }
+//    }
 
 //    @Override
 //    public void onAttach(Context context) {
@@ -120,8 +121,10 @@ public class BaseFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+        dbReference.removeEventListener(valueEventListener);
         mListener = null;
     }
+
 
     /**
      * This interface must be implemented by activities that contain this

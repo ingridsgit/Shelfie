@@ -10,9 +10,4 @@
         android:layout_height="@dimen/base_name_tv_height"
         android:id="@+id/base_name_text_view"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/base_description_text_view"/>
-
 </LinearLayout>

@@ -1,16 +1,22 @@
 package com.bazzillion.ingrid.shelfie;
 
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
+
+import java.util.List;
+
+@IgnoreExtraProperties
 public class Ingredient {
-    private String name;
-    private String type;
-    private String description;
-    private String properties;
-    private String[] forProduct;
-    private String[] forSkin;
+    public String name;
+    public String type;
+    public String description;
+    public String properties;
+    public List<String> forProduct;
+    public List<String> forSkin;
 
     public Ingredient(){}
 
-    public Ingredient(String name, String type, String description, String properties, String[] forProduct, String[] forSkin){
+    public Ingredient(String name, String type, String description, String properties, List<String> forProduct, List<String> forSkin){
         this.name = name;
         this.type = type;
         this.description = description;
