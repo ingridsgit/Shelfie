@@ -1,5 +1,6 @@
 package com.bazzillion.ingrid.shelfie;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,6 +28,7 @@ import java.util.List;
 public class AddOnFragment extends Fragment {
 
     private static final String KEY_BASE_NAME = "base_name";
+    protected static final String KEY_BASE = "base";
     private static final String KEY_DESCRITION = "description";
     private static final String KEY_PRIMARY_INGREDIENTS = "primary_ingredients";
     private static final String KEY_COMPULSORY_ADD_ONS = "compulsory_add_ons";
@@ -77,11 +79,11 @@ public class AddOnFragment extends Fragment {
                                 selectedBase = dataSnapshot.getValue(Base.class);
                                 if (selectedBase != null){
                                     selectedBase.name = dataSnapshot.getKey();
-                                    description = selectedBase.description;
-                                    primaryIngredients = selectedBase.primaryIngredients;
-                                    compulsoryAddOns = selectedBase.compulsoryAddOns;
-                                    optionalAddOns = selectedBase.optionalAddOns;
-                                    shelfLife = selectedBase.shelfLife;
+//                                    description = selectedBase.description;
+//                                    primaryIngredients = selectedBase.primaryIngredients;
+//                                    compulsoryAddOns = selectedBase.compulsoryAddOns;
+//                                    optionalAddOns = selectedBase.optionalAddOns;
+//                                    shelfLife = selectedBase.shelfLife;
                                     updateUi();
                                 }
                             }
@@ -93,12 +95,13 @@ public class AddOnFragment extends Fragment {
                         });
             }
         } else {
-            baseName = savedInstanceState.getString(KEY_BASE_NAME);
-            description = savedInstanceState.getString(KEY_DESCRITION);
-            primaryIngredients = savedInstanceState.getStringArrayList(KEY_PRIMARY_INGREDIENTS);
-            compulsoryAddOns = savedInstanceState.getStringArrayList(KEY_COMPULSORY_ADD_ONS);
-            optionalAddOns = savedInstanceState.getStringArrayList(KEY_OPTIONAL_ADD_ONS);
-            shelfLife = savedInstanceState.getString(KEY_SHELF_LIFE);
+            selectedBase = savedInstanceState.getParcelable(KEY_BASE);
+//            baseName = savedInstanceState.getString(KEY_BASE_NAME);
+//            description = savedInstanceState.getString(KEY_DESCRITION);
+//            primaryIngredients = savedInstanceState.getStringArrayList(KEY_PRIMARY_INGREDIENTS);
+//            compulsoryAddOns = savedInstanceState.getStringArrayList(KEY_COMPULSORY_ADD_ONS);
+//            optionalAddOns = savedInstanceState.getStringArrayList(KEY_OPTIONAL_ADD_ONS);
+//            shelfLife = savedInstanceState.getString(KEY_SHELF_LIFE);
         }
 
     }
@@ -127,13 +130,32 @@ public class AddOnFragment extends Fragment {
     }
 
     private void updateUi(){
-        descriptionView.setText(description);
-        shelfLifeTextView.setText(getText(R.string.shelf_life) + shelfLife);
+        descriptionView.setText(selectedBase.description);
+        shelfLifeTextView.setText(getString(R.string.shelf_life, selectedBase.shelfLife));
         ingredientArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
-        if (primaryIngredients != null){
-            ingredientArrayAdapter.addAll(primaryIngredients);
+        if (selectedBase.primaryIngredients != null){
+            ingredientArrayAdapter.addAll(selectedBase.primaryIngredients);
+            pickIngredientButton.setVisibility(View.GONE);
+        } else {
+            pickIngredientButton.setVisibility(View.VISIBLE);
+            pickIngredientButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startPickIngredientFragment(selectedBase);
+                }
+            });
         }
         ingredientListView.setAdapter(ingredientArrayAdapter);
+    }
+
+    private void startPickIngredientFragment(Base selectedBase){
+        if (getResources().getBoolean(R.bool.isTablet)){
+            getFragmentManager().beginTransaction().replace(R.id.pick_ingredient_fragment, PickIngredientFragment.newInstance(selectedBase)).commit();
+        } else {
+            Intent intent = new Intent(getActivity(), PickIngredientActivity.class);
+            intent.putExtra(KEY_BASE, selectedBase);
+            startActivity(intent);
+        }
 
     }
 
@@ -150,11 +172,12 @@ public class AddOnFragment extends Fragment {
         if (baseName != null){
             outState.putString(KEY_BASE_NAME, baseName);
         }
-            outState.putString(KEY_DESCRITION, description);
-            outState.putStringArrayList(KEY_PRIMARY_INGREDIENTS, (ArrayList<String>) primaryIngredients);
-            outState.putStringArrayList(KEY_COMPULSORY_ADD_ONS, (ArrayList<String>) compulsoryAddOns);
-            outState.putStringArrayList(KEY_OPTIONAL_ADD_ONS, (ArrayList<String>) optionalAddOns);
-            outState.putString(KEY_SHELF_LIFE, shelfLife);
+        outState.putParcelable(KEY_BASE, selectedBase);
+//            outState.putString(KEY_DESCRITION, description);
+//            outState.putStringArrayList(KEY_PRIMARY_INGREDIENTS, (ArrayList<String>) primaryIngredients);
+//            outState.putStringArrayList(KEY_COMPULSORY_ADD_ONS, (ArrayList<String>) compulsoryAddOns);
+//            outState.putStringArrayList(KEY_OPTIONAL_ADD_ONS, (ArrayList<String>) optionalAddOns);
+//            outState.putString(KEY_SHELF_LIFE, shelfLife);
     }
 
 

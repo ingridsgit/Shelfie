@@ -85,7 +85,10 @@
     <string name="add_ons">Add-ons</string>
     <string name="pick">Pick</string>
     <string name="save">Save</string>
-    <string name="shelf_life">Shelf life: </string>
+    <string name="shelf_life">Shelf life: %s</string>
 
     <string name="no_product">No product selected</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

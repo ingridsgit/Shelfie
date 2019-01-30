@@ -1,13 +1,17 @@
 package com.bazzillion.ingrid.shelfie;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.google.firebase.database.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @IgnoreExtraProperties
-public class Base {
+public class Base implements Parcelable {
     @Exclude
     public String name;
     public String description;
@@ -20,8 +24,8 @@ public class Base {
 
     }
 
-    public Base(String name, String description,
-                List<String> primaryIngredients, @Nullable List<String> compulsoryAddOns, @Nullable List<String> optionalAddOns, String shelfLife){
+    public Base(String name, String description, @Nullable List<String> primaryIngredients,
+                @Nullable List<String> compulsoryAddOns, @Nullable List<String> optionalAddOns, String shelfLife){
         this.name = name;
         this.description = description;
         this.primaryIngredients = primaryIngredients;
@@ -30,5 +34,44 @@ public class Base {
         this.shelfLife = shelfLife;
     }
 
+    public Base(Parcel in){
+        name = in.readString();
+        description = in.readString();
+        primaryIngredients = new ArrayList<>();
+        in.readStringList(primaryIngredients);
+        compulsoryAddOns = new ArrayList<>();
+        in.readStringList(compulsoryAddOns);
+        optionalAddOns = new ArrayList<>();
+        in.readStringList(optionalAddOns);
+        shelfLife = in.readString();
+    }
 
+    public static final Creator<Base> CREATOR = new Creator<Base>() {
+        @Override
+        public Base createFromParcel(Parcel in) {
+            return new Base(in);
+        }
+
+        @Override
+        public Base[] newArray(int size) {
+            return new Base[size];
+        }
+    };
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(description);
+        dest.writeStringList(primaryIngredients);
+        dest.writeStringList(compulsoryAddOns);
+        dest.writeStringList(optionalAddOns);
+        dest.writeString(shelfLife);
+
+    }
 }
