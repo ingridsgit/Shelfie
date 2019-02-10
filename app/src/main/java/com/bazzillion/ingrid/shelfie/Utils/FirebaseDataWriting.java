@@ -2,6 +2,7 @@ package com.bazzillion.ingrid.shelfie.Utils;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.bazzillion.ingrid.shelfie.Base;
@@ -45,6 +46,25 @@ public class FirebaseDataWriting {
             SOAP,
             TEXTURIZER,
             VEGETABLE_OIL};
+    static final String[] SKIN_TYPE_ARRAY = {
+            "REGULAR SKIN",
+            "DRY SKIN",
+            "COMBINATION SKIN",
+            "OILY SKIN",
+            "REGULAR HAIR",
+            "OILY HAIR",
+    };
+
+    static final String[] SPECIFICITY_ARRAY = {
+            "ACNEIC SKIN",
+            "MATURE SKIN",
+            "SAGGING SKIN / CELLULITE",
+            "ECZEMA",
+            "PSORIASIS",
+            "SCARS / STRETCH MARKS",
+            "DANDRUFF"
+    };
+    static final String LOG = "FIREBASEDATAWRITING";
 
     private static Map<String, List<String>> getTypesFromCsv(Context context) {
         Map<String, List<String>> typeTable = new HashMap<>();
@@ -97,10 +117,12 @@ public class FirebaseDataWriting {
      }
 
      private static Base extractBase(String[] line){
+         List<String> primaryIngredients = new ArrayList<>();
+        if ( !line[3].isEmpty()){
+            Collections.addAll(primaryIngredients, line[3]);
+        }
 
-        String[] primaryIngredientsArray = line[3].split(",");
-        List<String> primaryIngredients = new ArrayList<>();
-         Collections.addAll(primaryIngredients, primaryIngredientsArray);
+
 
          String[] compulsoryAddOnsArray;
          if (!line[4].isEmpty()){
@@ -111,11 +133,11 @@ public class FirebaseDataWriting {
 
          String[] optionalAddOnsArray;
          if (!line[5].isEmpty()){
-             optionalAddOnsArray = line[5].split(",");
+             optionalAddOnsArray = line[5].split(", ");
          }  else {optionalAddOnsArray = new String[0];}
          List<String> optionalAddOns = new ArrayList<>();
          Collections.addAll(optionalAddOns, optionalAddOnsArray);
-        return new Base(line[1], line[2], primaryIngredients, complusoryAddOns, optionalAddOns, line[6]);
+        return new Base(line[1], line[2], primaryIngredients, complusoryAddOns, optionalAddOns, line[6], line[7], line[0]);
 
      }
 
@@ -138,22 +160,129 @@ dbReference.child("Ingredient").child(String.valueOf(i)).addValueEventListener(n
         }
      }
 
-     public static void rectifierBanane(){
+     public static void changeListsToMaps(){
          FirebaseDatabase database = FirebaseDatabase.getInstance();
-         final DatabaseReference dbReference = database.getReference();
-         dbReference.child("Ingredient").child("\"Banana pulp \"").child(" peel").child("ingrid").setValue("essai");
-//                 .addValueEventListener(new ValueEventListener() {
-//             @Override
-//             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                 Ingredient ingredient = dataSnapshot.getValue(Ingredient.class);
-//                 dbReference.child("Ingredient").child("Banana pulp").setValue(ingredient);
-//             }
-//
-//             @Override
-//             public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//             }
-//         });
+         final DatabaseReference dbReference = database.getReference().child("Ingredient");
+         dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
+             @Override
+             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                 for (final DataSnapshot ingredientKey: dataSnapshot.getChildren()){
+                     dbReference.child(ingredientKey.getKey()).child("specificity").addListenerForSingleValueEvent(new ValueEventListener() {
+                         @Override
+                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                             Object value = dataSnapshot.getValue();
+                             if (value instanceof List){
+                                 List<String> skinTypes = (List<String>) value;
+                                 Map<String, Boolean> newMap = new HashMap<>();
+                                 if (skinTypes != null){
+                                     for (int i = 0; i < skinTypes.size(); i++){
+                                         newMap.put(skinTypes.get(i), true);
+                                     }
+                                     if (newMap.containsKey("SCARS / STRETCH MARKS")){
+                                         newMap.remove("SCARS / STRETCH MARKS");
+                                         newMap.put("SCARS - STRETCH MARKS", true);
+                                     }
+                                     if (newMap.containsKey("SAGGING SKIN / CELLULITE")){
+                                         newMap.remove("SAGGING SKIN / CELLULITE");
+                                         newMap.put("SAGGING SKIN - CELLULITE", true);
+                                     }
+                                     dbReference.child(ingredientKey.getKey()).child("specificity").setValue(newMap);
+                                 } else {
+                                     Log.i("ATTENTIOOOOON", ingredientKey.getKey());
+                                 }
+                             }
+                         }
+
+                         @Override
+                         public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                         }
+                     });
+                 }
+
+             }
+
+             @Override
+             public void onCancelled(@NonNull DatabaseError databaseError) {
+
+             }
+         });
+     }
+
+     public static void splitSkinTypeSpecificity(){
+
+         FirebaseDatabase database = FirebaseDatabase.getInstance();
+         final DatabaseReference dbReference = database.getReference().child("Ingredient");
+         dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
+             @Override
+             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                 List<String> ingredients = new ArrayList<>();
+            for (DataSnapshot ingredientKey: dataSnapshot.getChildren()) {
+
+                ingredients.add(ingredientKey.getKey());
+             }
+                 for (final String ingredient: ingredients){
+//                     dbReference.child(ingredient).child("forSkin").removeValue();
+                 }
+
+            for (final String ingredient: ingredients){
+                dbReference.child(ingredient).child("forSkin").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        List<String> specificities = (List<String>) dataSnapshot.getValue();
+                        List<String> newFirebaseSkinTypeValues = new ArrayList<>();
+                        for (String specificity : specificities){
+                            for (String skinType : SPECIFICITY_ARRAY){
+                                if (specificity.equals(skinType)){
+                                    newFirebaseSkinTypeValues.add(specificity);
+                                }
+                            }
+                        }
+                        dbReference.child(ingredient).child("specificity").setValue(newFirebaseSkinTypeValues);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+             }
+
+             @Override
+             public void onCancelled(@NonNull DatabaseError databaseError) {
+             }
+         });
+     }
+
+     public static void addBodyPart(Context context){
+         FirebaseDatabase database = FirebaseDatabase.getInstance();
+         DatabaseReference dbReference = database.getReference().child("base");
+         CSVReader csvReader = new CSVReader(new InputStreamReader(context.getResources().openRawResource(R.raw.base_essai)));
+         String[] nextLine;
+         try {
+             while ((nextLine = csvReader.readNext()) != null) {
+                 dbReference.child(nextLine[1]).child("bodyPart").setValue(nextLine[7]);
+             }
+             csvReader.close();
+         } catch (IOException e){
+             e.printStackTrace();
+         }
+     }
+
+     public static void addProductInBase(Context context){
+         FirebaseDatabase database = FirebaseDatabase.getInstance();
+         DatabaseReference dbReference = database.getReference().child("base");
+         CSVReader csvReader = new CSVReader(new InputStreamReader(context.getResources().openRawResource(R.raw.base_essai)));
+         String[] nextLine;
+         try {
+             while ((nextLine = csvReader.readNext()) != null) {
+                 dbReference.child(nextLine[1]).child("product").setValue(nextLine[0]);
+             }
+             csvReader.close();
+         } catch (IOException e){
+             e.printStackTrace();
+         }
      }
 
 
@@ -161,12 +290,12 @@ dbReference.child("Ingredient").child(String.valueOf(i)).addValueEventListener(n
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference dbReference = database.getReference();
         DatabaseReference childReference = dbReference.child("type");
-        Map<String, List<String>> typeMap = getTypesFromCsv(context);
-        Set<Map.Entry<String, List<String>>> entrySet = typeMap.entrySet();
-        for (Map.Entry<String, List<String>> entry : entrySet ) {
-            childReference.child(entry.getKey()).setValue(entry.getValue());
-        }
-        addProductsToDb(context, dbReference);
+//        Map<String, List<String>> typeMap = getTypesFromCsv(context);
+//        Set<Map.Entry<String, List<String>>> entrySet = typeMap.entrySet();
+//        for (Map.Entry<String, List<String>> entry : entrySet ) {
+//            childReference.child(entry.getKey()).setValue(entry.getValue());
+//        }
+//        addProductsToDb(context, dbReference);
         CSVReader csvReader = new CSVReader(new InputStreamReader(context.getResources().openRawResource(R.raw.base_essai)));
         String[] nextLine;
         int i = 0;

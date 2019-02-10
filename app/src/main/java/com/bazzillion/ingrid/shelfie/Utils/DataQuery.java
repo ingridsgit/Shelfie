@@ -24,16 +24,17 @@ public final class DataQuery {
 
     private static final String URI_BASE = "https://shelfie-18c58.firebaseio.com/";
     private static final String KEY_BASE = "base.json";
+    private static final String KEY_INGREDIENT = "Ingredient.json";
     private static final String PARAM_ORDER_BY = "orderBy";
     private static final String VALUE_NAME = "\"name\"";
     private static final String PARAM_EQUAL_TO = "equalTo";
     private static final String LOG_TAG = DataQuery.class.getSimpleName();
 
-    private static URL buildUrl(String baseName) {
+    private static URL buildUrl(String baseName, String key) {
         URL url = null;
         Uri.Builder uri = Uri.parse(URI_BASE)
                 .buildUpon()
-                .appendEncodedPath(KEY_BASE)
+                .appendEncodedPath(key)
                 .appendQueryParameter(PARAM_ORDER_BY, VALUE_NAME)
                 .appendQueryParameter(PARAM_EQUAL_TO, "\"" + baseName + "\"");
         try {

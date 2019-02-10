@@ -12,23 +12,23 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bazzillion.ingrid.shelfie.Utils.FirebaseDataWriting;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AddOnFragment extends Fragment {
 
     private static final String KEY_BASE_NAME = "base_name";
     protected static final String KEY_BASE = "base";
+    protected static final String KEY_IS_OPTIONAL = "isOptional";
+    protected static final int COMPULSORY_ADD_ON = 123;
+    protected static final int OPTIONAL_ADD_ON = 234;
     private static final String KEY_DESCRITION = "description";
     private static final String KEY_PRIMARY_INGREDIENTS = "primary_ingredients";
     private static final String KEY_COMPULSORY_ADD_ONS = "compulsory_add_ons";
@@ -46,7 +46,7 @@ public class AddOnFragment extends Fragment {
     private TextView descriptionView;
     private ArrayAdapter<String> ingredientArrayAdapter;
     private ListView ingredientListView;
-    private RecyclerView addOnRecyclerView;
+    private ListView addOnListView;
     private Button pickIngredientButton;
     private Button pickAddOnButton;
     private Button saveButton;
@@ -111,9 +111,9 @@ public class AddOnFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_on, container, false);
         descriptionView = view.findViewById(R.id.base_description_text_view);
-        ingredientListView = view.findViewById(R.id.base_ingredient_recycler_view);
+        ingredientListView = view.findViewById(R.id.base_ingredient_list_view);
         pickIngredientButton = view.findViewById(R.id.pick_base_ingredient_button);
-        addOnRecyclerView = view.findViewById(R.id.add_on_recycler_view);
+        addOnListView = view.findViewById(R.id.add_on_list_view);
         pickAddOnButton = view.findViewById(R.id.pick_add_on_button);
         saveButton = view.findViewById(R.id.save_button);
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -123,7 +123,7 @@ public class AddOnFragment extends Fragment {
             }
         });
         shelfLifeTextView = view.findViewById(R.id.shelf_life_text_view);
-        if (savedInstanceState != null){
+        if (savedInstanceState != null && selectedBase != null){
             updateUi();
         }
         return view;
@@ -132,8 +132,8 @@ public class AddOnFragment extends Fragment {
     private void updateUi(){
         descriptionView.setText(selectedBase.description);
         shelfLifeTextView.setText(getString(R.string.shelf_life, selectedBase.shelfLife));
-        ingredientArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
-        if (selectedBase.primaryIngredients != null){
+        if (selectedBase.primaryIngredients != null && getContext() != null){
+            ingredientArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
             ingredientArrayAdapter.addAll(selectedBase.primaryIngredients);
             pickIngredientButton.setVisibility(View.GONE);
         } else {
@@ -141,19 +141,27 @@ public class AddOnFragment extends Fragment {
             pickIngredientButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startPickIngredientFragment(selectedBase);
+                    startPickIngredientFragment(selectedBase, COMPULSORY_ADD_ON);
                 }
             });
         }
         ingredientListView.setAdapter(ingredientArrayAdapter);
+        ArrayAdapter<String> addOnAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+        pickAddOnButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startPickIngredientFragment(selectedBase, OPTIONAL_ADD_ON);
+            }
+        });
     }
 
-    private void startPickIngredientFragment(Base selectedBase){
+    private void startPickIngredientFragment(Base selectedBase, int isOptional){
         if (getResources().getBoolean(R.bool.isTablet)){
-            getFragmentManager().beginTransaction().replace(R.id.pick_ingredient_fragment, PickIngredientFragment.newInstance(selectedBase)).commit();
+            getFragmentManager().beginTransaction().replace(R.id.pick_ingredient_fragment, PickIngredientFragment.newInstance(selectedBase, isOptional)).commit();
         } else {
             Intent intent = new Intent(getActivity(), PickIngredientActivity.class);
             intent.putExtra(KEY_BASE, selectedBase);
+            intent.putExtra(KEY_IS_OPTIONAL, isOptional);
             startActivity(intent);
         }
 

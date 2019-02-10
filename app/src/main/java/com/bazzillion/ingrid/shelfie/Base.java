@@ -19,19 +19,23 @@ public class Base implements Parcelable {
     public List<String> compulsoryAddOns;
     public List<String> optionalAddOns;
     public String shelfLife;
+    public String bodyPart;
+    public String product;
 
     public Base(){
 
     }
 
-    public Base(String name, String description, @Nullable List<String> primaryIngredients,
-                @Nullable List<String> compulsoryAddOns, @Nullable List<String> optionalAddOns, String shelfLife){
+    public Base(String name, String description, @Nullable List<String> primaryIngredients, @Nullable List<String> compulsoryAddOns,
+                @Nullable List<String> optionalAddOns, String shelfLife, String bodyPart, String product){
         this.name = name;
         this.description = description;
         this.primaryIngredients = primaryIngredients;
         this.compulsoryAddOns = compulsoryAddOns;
         this.optionalAddOns = optionalAddOns;
         this.shelfLife = shelfLife;
+        this.bodyPart = bodyPart;
+        this.product = product;
     }
 
     public Base(Parcel in){
@@ -44,6 +48,8 @@ public class Base implements Parcelable {
         optionalAddOns = new ArrayList<>();
         in.readStringList(optionalAddOns);
         shelfLife = in.readString();
+        bodyPart = in.readString();
+        product = in.readString();
     }
 
     public static final Creator<Base> CREATOR = new Creator<Base>() {
@@ -72,6 +78,7 @@ public class Base implements Parcelable {
         dest.writeStringList(compulsoryAddOns);
         dest.writeStringList(optionalAddOns);
         dest.writeString(shelfLife);
-
+        dest.writeString(bodyPart);
+        dest.writeString(product);
     }
 }

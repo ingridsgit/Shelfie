@@ -35,10 +35,10 @@
     <array name="skin_specificities_entryvalues">
         <item>ACNEIC SKIN</item>
         <item>MATURE SKIN</item>
-        <item>SAGGING SKIN / CELLULITE</item>
+        <item>SAGGING SKIN - CELLULITE</item>
         <item>ECZEMA</item>
         <item>PSORIASIS</item>
-        <item>SCARS / STRETCH MARKS</item>
+        <item>SCARS - STRETCH MARKS</item>
     </array>
 
     <array name="skin_specificities_entries">
@@ -61,6 +61,11 @@
         <item>Oily hair</item>
         <item>Dry hair</item>
     </array>
+
+    <string name="key_skin_type">skin_type_preference</string>
+    <string name="key_skin_specificity">skin_specificity_preference</string>
+    <string name="key_hair_type">hair_type_preference</string>
+    <string name="key_dandruff">dandruff_preference</string>
 
     <string name="skin_type">What\'s your skin type?"</string>
     <string name="skin_specificities">Does your skin have any specificity?</string>
@@ -86,9 +91,8 @@
     <string name="pick">Pick</string>
     <string name="save">Save</string>
     <string name="shelf_life">Shelf life: %s</string>
+    <string name="select">Select the %s</string>
 
     <string name="no_product">No product selected</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

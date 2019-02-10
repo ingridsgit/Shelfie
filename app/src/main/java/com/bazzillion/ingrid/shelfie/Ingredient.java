@@ -12,16 +12,18 @@ public class Ingredient {
     public String description;
     public String properties;
     public List<String> forProduct;
-    public List<String> forSkin;
+    public List<String> skinType;
+    public List<String> specificity;
 
     public Ingredient(){}
 
-    public Ingredient(String name, String type, String description, String properties, List<String> forProduct, List<String> forSkin){
+    public Ingredient(String name, String type, String description, String properties, List<String> forProduct, List<String> skinType, List<String> specificity){
         this.name = name;
         this.type = type;
         this.description = description;
         this.properties = properties;
         this.forProduct = forProduct;
-        this.forSkin = forSkin;
+        this.skinType = skinType;
+        this.specificity = specificity;
     }
 }

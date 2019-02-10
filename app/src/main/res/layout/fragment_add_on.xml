@@ -21,7 +21,7 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/base_ingredient_recycler_view"/>
+        android:id="@+id/base_ingredient_list_view"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -35,10 +35,10 @@
         style="@style/sectionStyle"
         android:text="@string/add_ons"/>
 
-    <android.support.v7.widget.RecyclerView
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/add_on_recycler_view"/>
+        android:id="@+id/add_on_list_view"/>
 
     <Button
         android:layout_width="wrap_content"
