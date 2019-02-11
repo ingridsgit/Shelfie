@@ -14,11 +14,11 @@ public class PickIngredientActivity extends DrawerActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pick_ingredient);
         super.onCreateDrawer();
-        FragmentManager fragmentManager = getSupportFragmentManager();
 
         if (savedInstanceState == null){
             selectedBase = getIntent().getParcelableExtra(AddOnFragment.KEY_BASE);
             isOptional = getIntent().getIntExtra(AddOnFragment.KEY_IS_OPTIONAL, AddOnFragment.COMPULSORY_ADD_ON);
+            FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.pick_ingredient_fragment, PickIngredientFragment.newInstance(selectedBase, isOptional)).commit();
 
         } else {
@@ -27,7 +27,6 @@ public class PickIngredientActivity extends DrawerActivity {
 
         }
         setTitle(selectedBase.name);
-
     }
 
     @Override

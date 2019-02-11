@@ -90,6 +90,8 @@
     <string name="add_ons">Add-ons</string>
     <string name="pick">Pick</string>
     <string name="save">Save</string>
+    <string name="clear">Clear</string>
+    <string name="confirm">Confirm</string>
     <string name="shelf_life">Shelf life: %s</string>
     <string name="select">Select the %s</string>
 

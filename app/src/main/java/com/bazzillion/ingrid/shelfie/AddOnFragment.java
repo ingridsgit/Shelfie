@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,20 +19,29 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import static android.app.Activity.RESULT_OK;
 
 public class AddOnFragment extends Fragment {
 
     private static final String KEY_BASE_NAME = "base_name";
     protected static final String KEY_BASE = "base";
     protected static final String KEY_IS_OPTIONAL = "isOptional";
+    protected static final String KEY_SELECTED_INGREDIENTS = "selection";
     protected static final int COMPULSORY_ADD_ON = 123;
     protected static final int OPTIONAL_ADD_ON = 234;
+    private static final String KEY_SELECTED_COMPULSORY = "selected_compulsory";
+    private static final String KEY_SELECTED_OPTIONAL = "selected_optional";
+    private static final String KEY_INGREDIENT_ADAPTER = "ingredient_adapter";
+    private static final String KEY_ADD_ON_ADAPTER = "add_on_adapter";
     private static final String KEY_DESCRITION = "description";
     private static final String KEY_PRIMARY_INGREDIENTS = "primary_ingredients";
     private static final String KEY_COMPULSORY_ADD_ONS = "compulsory_add_ons";
     private static final String KEY_OPTIONAL_ADD_ONS = "optional_add_ons";
-    private static final String KEY_SHELF_LIFE = "shels_life";
+    private static final String KEY_SHELF_LIFE = "shelf_life";
     private static final String FIREBASE_KEY_BASE = "base";
     private static final String FIREBASE_KEY_INGREDIENT = "Ingredient";
     private String baseName;
@@ -45,6 +53,7 @@ public class AddOnFragment extends Fragment {
     public String shelfLife;
     private TextView descriptionView;
     private ArrayAdapter<String> ingredientArrayAdapter;
+    private ArrayAdapter<String> addOnAdapter;
     private ListView ingredientListView;
     private ListView addOnListView;
     private Button pickIngredientButton;
@@ -52,6 +61,8 @@ public class AddOnFragment extends Fragment {
     private Button saveButton;
     private TextView shelfLifeTextView;
     private FirebaseDatabase firebaseDatabase;
+    private List<String> selectedCompulsory = new ArrayList<>();
+    private List<String> selectedOptional = new ArrayList<>();
 
     public AddOnFragment(){
 
@@ -79,11 +90,6 @@ public class AddOnFragment extends Fragment {
                                 selectedBase = dataSnapshot.getValue(Base.class);
                                 if (selectedBase != null){
                                     selectedBase.name = dataSnapshot.getKey();
-//                                    description = selectedBase.description;
-//                                    primaryIngredients = selectedBase.primaryIngredients;
-//                                    compulsoryAddOns = selectedBase.compulsoryAddOns;
-//                                    optionalAddOns = selectedBase.optionalAddOns;
-//                                    shelfLife = selectedBase.shelfLife;
                                     updateUi();
                                 }
                             }
@@ -96,12 +102,11 @@ public class AddOnFragment extends Fragment {
             }
         } else {
             selectedBase = savedInstanceState.getParcelable(KEY_BASE);
-//            baseName = savedInstanceState.getString(KEY_BASE_NAME);
-//            description = savedInstanceState.getString(KEY_DESCRITION);
-//            primaryIngredients = savedInstanceState.getStringArrayList(KEY_PRIMARY_INGREDIENTS);
-//            compulsoryAddOns = savedInstanceState.getStringArrayList(KEY_COMPULSORY_ADD_ONS);
-//            optionalAddOns = savedInstanceState.getStringArrayList(KEY_OPTIONAL_ADD_ONS);
-//            shelfLife = savedInstanceState.getString(KEY_SHELF_LIFE);
+            selectedCompulsory = savedInstanceState.getStringArrayList(KEY_SELECTED_COMPULSORY);
+            selectedOptional = savedInstanceState.getStringArrayList(KEY_SELECTED_OPTIONAL);
+            ingredientListView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_INGREDIENT_ADAPTER));
+            addOnListView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_ADD_ON_ADAPTER));
+
         }
 
     }
@@ -124,6 +129,7 @@ public class AddOnFragment extends Fragment {
         });
         shelfLifeTextView = view.findViewById(R.id.shelf_life_text_view);
         if (savedInstanceState != null && selectedBase != null){
+//            ingredientListView.onRestoreInstanceState(savedInstanceState.getParcelable("ADAPTER"));
             updateUi();
         }
         return view;
@@ -132,11 +138,15 @@ public class AddOnFragment extends Fragment {
     private void updateUi(){
         descriptionView.setText(selectedBase.description);
         shelfLifeTextView.setText(getString(R.string.shelf_life, selectedBase.shelfLife));
-        if (selectedBase.primaryIngredients != null && getContext() != null){
-            ingredientArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+        ingredientArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+        if (selectedBase.primaryIngredients != null){
             ingredientArrayAdapter.addAll(selectedBase.primaryIngredients);
-            pickIngredientButton.setVisibility(View.GONE);
+            if (!ingredientArrayAdapter.isEmpty()){
+                pickIngredientButton.setVisibility(View.GONE);
+            }
+
         } else {
+            ingredientArrayAdapter.addAll(selectedCompulsory);
             pickIngredientButton.setVisibility(View.VISIBLE);
             pickIngredientButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -146,7 +156,9 @@ public class AddOnFragment extends Fragment {
             });
         }
         ingredientListView.setAdapter(ingredientArrayAdapter);
-        ArrayAdapter<String> addOnAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+        addOnAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+        addOnListView.setAdapter(addOnAdapter);
+        addOnAdapter.addAll(selectedOptional);
         pickAddOnButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -162,12 +174,31 @@ public class AddOnFragment extends Fragment {
             Intent intent = new Intent(getActivity(), PickIngredientActivity.class);
             intent.putExtra(KEY_BASE, selectedBase);
             intent.putExtra(KEY_IS_OPTIONAL, isOptional);
-            startActivity(intent);
+            startActivityForResult(intent, isOptional);
         }
 
     }
 
-
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == COMPULSORY_ADD_ON){
+            if (resultCode == RESULT_OK){
+                HashMap<Integer, String> hashMap = (HashMap<Integer, String>) data.getSerializableExtra(KEY_SELECTED_INGREDIENTS);
+                selectedCompulsory.clear();
+                selectedCompulsory.addAll(hashMap.values());
+                ingredientArrayAdapter.clear();
+                ingredientArrayAdapter.addAll(selectedCompulsory);
+            }
+        } else if (requestCode == OPTIONAL_ADD_ON){
+            if (resultCode == RESULT_OK){
+                HashMap<Integer, String> hashMap = (HashMap<Integer, String>) data.getSerializableExtra(KEY_SELECTED_INGREDIENTS);
+                selectedOptional.clear();
+                selectedOptional.addAll(hashMap.values());
+                addOnAdapter.clear();
+                addOnAdapter.addAll(selectedOptional);
+            }
+        }
+    }
 
     @Override
     public void onDetach() {
@@ -181,11 +212,12 @@ public class AddOnFragment extends Fragment {
             outState.putString(KEY_BASE_NAME, baseName);
         }
         outState.putParcelable(KEY_BASE, selectedBase);
-//            outState.putString(KEY_DESCRITION, description);
-//            outState.putStringArrayList(KEY_PRIMARY_INGREDIENTS, (ArrayList<String>) primaryIngredients);
-//            outState.putStringArrayList(KEY_COMPULSORY_ADD_ONS, (ArrayList<String>) compulsoryAddOns);
-//            outState.putStringArrayList(KEY_OPTIONAL_ADD_ONS, (ArrayList<String>) optionalAddOns);
-//            outState.putString(KEY_SHELF_LIFE, shelfLife);
+        outState.putParcelable(KEY_INGREDIENT_ADAPTER, ingredientListView.onSaveInstanceState());
+        outState.putParcelable(KEY_ADD_ON_ADAPTER, addOnListView.onSaveInstanceState());
+        outState.putStringArrayList(KEY_SELECTED_COMPULSORY, (ArrayList<String>) selectedCompulsory);
+        outState.putStringArrayList(KEY_SELECTED_OPTIONAL, (ArrayList<String>) selectedOptional);
+
+
     }
 
 

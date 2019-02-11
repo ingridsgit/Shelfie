@@ -27,10 +27,26 @@
                 android:id="@+id/recipe_list_view"
                 />
 
-            <Button
+            <RadioGroup
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/button"/>
+                android:id="@+id/radio_group">
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/button1"
+                    android:text="@string/clear"/>
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/button2"
+                    android:text="@string/key_dandruff" />
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/button3"
+                    android:text="@string/pick_base"/>
+            </RadioGroup>
 
         </LinearLayout>
 
