@@ -1,9 +1,9 @@
 package com.bazzillion.ingrid.shelfie;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.widget.TextView;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+
 import android.widget.Toast;
 
 public class NewRecipeActivity extends DrawerActivity implements BaseAdapter.BaseClickHandler {
