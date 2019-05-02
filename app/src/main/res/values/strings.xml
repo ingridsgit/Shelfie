@@ -96,5 +96,7 @@
     <string name="select">Select the %s</string>
 
     <string name="no_product">No product selected</string>
+    <string name="please_select">Please select a base ingredient</string>
+    <string name="saved">%s saved</string>
 
 </resources>

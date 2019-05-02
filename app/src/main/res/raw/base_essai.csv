@@ -8,6 +8,32 @@ SHAMPOO,Clay shampoo,"Depending on your hair length, mix 1 to 3 tablespoons of t
 SHAMPOO,Soap shampoo,"You can either use liquid natural soap or melt some hard soap into filtered water (slowly heat up one part of water and add two parts of soap cut into small pieces, stir occasionally until melted). Do not add lemon nor vinegar.",,Soap,"Aqueous phase, Cosmetic ingredient, Essential oil, Texturizer, Preservative",Two weeks,hair
 SHAMPOO,Baking soda shampoo,Combine one part baking soda with three parts water. Apply at the roots and let sit for 1 to 3 minutes. Rinse thoroughly.,Baking Soda,,Essential oil,Single use,hair
 CONDITIONER,Apple cider vinegar conditioner,This conditioner is widely recognized for making the hair shiny. It also helps untangling your hair. Use it as the last rinse. Suitable for all hair types.,Apple cider vinegar,,"Aqueous phase, Essential oil",Single use,hair
-CONDITIONER,Aloe conditioner,"gel d’aloe vera / huile vegetale, laisser poser 10 minutes",Aloe Vera Gel,Vegetable oil,,,hair
-CONDITIONER,Oat flour conditioner,farine d’avoine,2 cuilleres a cafe dans un verre d’eau et laisser poser 10 minutes. Appliquer sur les longueurs laisser poser 5 minutes,,,,hair
-CONDITIONER,Green tea conditioner,infusion de the vert,,,,,hair
+CONDITIONER,Aloe leave-in conditioner,"Put 1 portion of the vegetable oil of your choice for 4 portions of aloe vera gel or pulp into the blender and liquefy. If using the pulp, make sure you strain the mixture. Apply on the lenghts. Use a vaporizer for best results. Don’t rinse.",Aloe Vera Gel,Vegetable oil,"Aqueous phase, Essential oil, Preservative",One week in the fridge,hair
+CONDITIONER,Oat flour conditioner,Boil 1 tablespoon into 100mL (3fl oz) of water for about 30 minutes. Sieve the mixture. Let it cool off and apply after the shampoo. Leave it on for 5 minutes before you rinse.,Oat flour,,"Cosmetic ingredient, Essential oil, Preservative",One week in the fridge,hair
+CONDITIONER,Green tea conditioner,Brew 4 teabags or teaspoons of loose-leaf green tea into 2 cups of water. Make sure you use organic tea. Use it as the last rinse. It can also be applied to the scalp. It stimulates hair growth.,Green tea,,Essential oil,Single use,hair
+HAIR MASK,Olive oil hair mask,"Great for itchy scalp. Mix the lemon juice with the vegetable oil with a bit of water, apply to hair and leave it on for about 20 minutes, then shampoo as usual.",Lemon juice,Vegetable oil,Essential oil,Single use,hair
+HAIR MASK,Apple cider vinegar hair mask,Great for oily hair. Mix 2 parts apple cider vinegar for one part lemon. Apply on hair length and scalp. Let it sit for 5 minutes before you rinse.,"Apple cider vinegar, Lemon juice",,Essential oil,Single use,hair
+HAIR MASK,Honey hair mask,Great for dry hair. Mix equal parts of honey and vegetable oil. Apply on hair length and let it sit for 15 minutes before you rinse.,Honey,Vegetable oil,Essential oil,Single use,hair
+HAIR MASK,Egg hair mask,"This mask is nourishing and great for all hair types. Depending on the size of your hair, crack one or two eggs into a bowl and whisk them well. Add the other ingredients if any. Apply the mask to scalp and lengths, and leave it on at least 15 minutes. Make sure the water is not too hot when rinsing your hair, it could cook the eggs. ",Egg,,"Aqueous phase, Cosmetic ingredient, Fruit pulp, Vegetable oil, Essential oil",Single use,hair
+HAIR MASK,Clay hair mask,¼ cup rhassoul claycEnough rose water to create a paste 2 tsp argan oil use a non metallic recipient ,,,,Single use,hair
+HAIR MASK,Avocado hair mask,Works especially well on curly and dry hair. Put the avocado into a blender and mix with the other ingredients until smooth. Apply on lengths and leave it in for 20 minutes. Use a hair cap for best results.,Avocado,,"Aqueous phase, Cosmetic ingredient, Fruit pulp, Vegetable oil, Essential oil",Single use,hair
+FACE MASK,Honey face mask,honeyAcne + all types ,,,,,skin
+FACE MASK,Oat face mask,Combine 1/2 cup hot water and 1/3 cup oatmeal. After the water and oatmeal have settled for two or three minutes ,,,,,skin
+FACE MASK,Avocado face mask,"Mash up the avocado into a smooth paste, then gently apply it to your face and neck. Let it sit for 10 to 20 minutes, then rinse it off with cold water",Avocado,,"Aqueous phase, Cosmetic ingredient, Fruit pulp, Vegetable oil",Single use,skin
+FACE MASK,Yogurt face mask,slather some plain yogurt on your face and let it sit for about 20 minutes,,,,,skin
+FACE MASK,Egg white face mask,resserre les pores,,,,,skin
+FACE MASK,Banana face mask,"Mash up a medium-sized ripe banana into a smooth paste, then gently apply it to your face and neck. Let it sit for 10 to 20 minutes, then rinse it off with cold water",Banana pulp,,"Aqueous phase, Cosmetic ingredient, Fruit pulp, Vegetable oil",Single use,skin
+MAKE UP REMOVER,Biphase make up remover,une huile vegetale + un hydrolat ou aloe vera,,,,,skin
+BODY CREAM,Shea butter body cream,beurre de karite fouette,,,,,skin
+BODY CREAM,Coconut oil body cream,huile de coco,,,,,skin
+BODY CREAM,Liniment,liniment,,,,,skin
+SHOWER GEL,Corn flour shower gel,farine de mais/vinaigre de cidre,,,,,skin
+SHOWER GEL,Soap shower gel,"50g de savon au choix
+15 gouttes d’huile essentielle (facultatif)
+huile vegetale (facultatif)
+2 cuillères à soupe de glycérine végétale ou miel
+10 gouttes de conservateur
+ne pas malanger avec du vinaigre ou du citron	si savon solide, raper et faire fondre dans 1L d'eau dans une casserolle a feu doux pendant 15 minutes.
+Ajouter huile esentielle. laisser refroidir une heure. ajouter glycerine et conservateur	",,,,,skin
+SCRUB,Vegetable oil scrub,"Pick your oil and add either salt, cane sugar, or coffee ground for a firming effect. Do not scrub your face more than once a week, it could irritate your skin. Apply gently on clean skin, on body or face, avoiding the eye contour area.",,Vegetable oil,,Single use,skin
+SCRUB,Oil free scrub,"Pick your base ingredient and add either salt, cane sugar, or coffee ground for a firming effect. Do not scrub your face more than once a week, it could irritate your skin. Apply gently on clean skin, on body or face, avoiding the eye contour area.",,Cosmetic ingredient,,Single use,skin

@@ -14,6 +14,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bazzillion.ingrid.shelfie.Database.AppDatabase;
+import com.bazzillion.ingrid.shelfie.Database.Recipe;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -44,6 +46,7 @@ public class AddOnFragment extends Fragment {
     private static final String KEY_SHELF_LIFE = "shelf_life";
     private static final String FIREBASE_KEY_BASE = "base";
     private static final String FIREBASE_KEY_INGREDIENT = "Ingredient";
+    private static final String SEPARATOR = "-,,,-";
     private String baseName;
     private Base selectedBase;
     public String description;
@@ -63,6 +66,7 @@ public class AddOnFragment extends Fragment {
     private FirebaseDatabase firebaseDatabase;
     private List<String> selectedCompulsory = new ArrayList<>();
     private List<String> selectedOptional = new ArrayList<>();
+    private AppDatabase appDatabase;
 
     public AddOnFragment(){
 
@@ -80,6 +84,7 @@ public class AddOnFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         firebaseDatabase = FirebaseDatabase.getInstance();
+        appDatabase = AppDatabase.getInstance(getContext());
         if (savedInstanceState == null) {
             if (getArguments() != null) {
                 baseName = getArguments().getString(KEY_BASE_NAME);
@@ -124,7 +129,42 @@ public class AddOnFragment extends Fragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (selectedBase != null){
+                    // check that the user has selected the compulsory ingredients
+                    if (ingredientArrayAdapter.isEmpty()){
+                        Toast.makeText(getContext(), R.string.please_select, Toast.LENGTH_LONG).show();
+                    } else {
+                        // get the list of all compulsory ingredients, either pre selected or selected by the user
 
+                        List<String> myPrimaryIngredients = new ArrayList<>();
+                        if (selectedBase.primaryIngredients != null){
+                            myPrimaryIngredients.addAll(selectedBase.primaryIngredients);
+                        }
+                        if (selectedCompulsory != null){
+                            myPrimaryIngredients.addAll(selectedCompulsory);
+                        }
+
+                        String myAddOns = null;
+                        if (selectedOptional != null){
+                            myAddOns = convertListToString(selectedOptional);
+                        }
+
+
+
+                        //TODO: open prompt to edit the recipe name. auto populate with 'my' + base name in lower case
+                        Recipe recipe = new Recipe("MY FIRST RECIPE",
+                                selectedBase.name,
+                                convertListToString(myPrimaryIngredients),
+                                myAddOns);
+
+                        appDatabase.recipeDao().insertNewRecipe(recipe);
+                        Toast.makeText(getContext(), getResources().getString(R.string.saved, "MY FIRST RECIPE") , Toast.LENGTH_LONG).show();
+                        getActivity().finish();
+                    }
+
+                } else {
+                    Toast.makeText(getContext(), R.string.no_product, Toast.LENGTH_LONG).show();
+                }
             }
         });
         shelfLifeTextView = view.findViewById(R.id.shelf_life_text_view);
@@ -133,6 +173,18 @@ public class AddOnFragment extends Fragment {
             updateUi();
         }
         return view;
+    }
+
+    private String convertListToString(List<String> list){
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0 ; i <list.size() ; i++) {
+            stringBuilder.append(list.get(i));
+            // Do not append comma at the end of last element
+            if( i < list.size() -1){
+                stringBuilder.append(SEPARATOR);
+            }
+        }
+        return stringBuilder.toString();
     }
 
     private void updateUi(){
