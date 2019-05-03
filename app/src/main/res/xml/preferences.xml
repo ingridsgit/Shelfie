@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:key="@string/key_skin_type"
+        android:title="@string/skin_type"
+        android:entries="@array/skin_type_entries"
+        android:entryValues="@array/skin_type_entryvalues" />
+
+    <MultiSelectListPreference
+        android:key="@string/key_skin_specificity"
+        android:title="@string/skin_specificities"
+        android:entries="@array/skin_specificities_entries"
+        android:entryValues="@array/skin_specificities_entryvalues" />
+
+    <ListPreference
+        android:key="@string/key_hair_type"
+        android:title="@string/hair_type"
+        android:entries="@array/hair_type_entries"
+        android:entryValues="@array/hair_type_entryvalues" />
+
+    <CheckBoxPreference
+        android:key="@string/key_dandruff"
+        android:title="@string/dandruff_checkbox_preference"
+        android:summaryOn="@string/summary_dandruff_on"
+        android:summaryOff="@string/summary_dandruff_off"/>
+
+
+</PreferenceScreen>

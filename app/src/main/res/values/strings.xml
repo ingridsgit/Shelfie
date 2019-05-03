@@ -1,0 +1,102 @@
+<resources>
+    <string name="app_name">Shelfie</string>
+    <string name="disclaimer">The recipes are for information purposes only and have no medical value.\n
+        Always try to use the ingredients on a small portion of your skin and allow 24 hours to check for allergies.\n
+        Make sure you clean your containers and ustensils before making your cosmetics. \n
+        Essential oils are to be diluted and are not suitable for pregnant or breastfeeding women. \n
+        It may take several tries to find the recipe that best suits your needs. Be patient !</string>
+
+    <array name="product_array">
+        <item>Toothpaste</item>
+        <item>Face mask</item>
+        <item>Make-up remover</item>
+        <item>Scrub</item>
+        <item>Body cream</item>
+        <item>Shower gel</item>
+        <item>Shampoo</item>
+        <item>Conditioner</item>
+        <item>Hair mask</item>
+    </array>
+
+    <array name="skin_type_entryvalues">
+        <item>REGULAR SKIN</item>
+        <item>DRY SKIN</item>
+        <item>COMBINATION SKIN</item>
+        <item>OILY SKIN</item>
+    </array>
+
+    <array name="skin_type_entries">
+        <item>Regular skin</item>
+        <item>Dry skin</item>
+        <item>Combination skin</item>
+        <item>Oily skin</item>
+    </array>
+
+    <array name="skin_specificities_entryvalues">
+        <item>ACNEIC SKIN</item>
+        <item>MATURE SKIN</item>
+        <item>SAGGING SKIN - CELLULITE</item>
+        <item>ECZEMA</item>
+        <item>PSORIASIS</item>
+        <item>SCARS - STRETCH MARKS</item>
+    </array>
+
+    <array name="skin_specificities_entries">
+        <item>Acneic skin</item>
+        <item>Mature skin</item>
+        <item>Sagging skin / Cellulitis</item>
+        <item>Eczema</item>
+        <item>Psoriasis</item>
+        <item>Scars / Stretch marks</item>
+    </array>
+
+    <array name="hair_type_entryvalues">
+        <item>REGULAR HAIR</item>
+        <item>OILY HAIR</item>
+        <item>DRY HAIR</item>
+    </array>
+
+    <array name="hair_type_entries">
+        <item>Regular hair</item>
+        <item>Oily hair</item>
+        <item>Dry hair</item>
+    </array>
+
+    <string name="key_skin_type">skin_type_preference</string>
+    <string name="key_skin_specificity">skin_specificity_preference</string>
+    <string name="key_hair_type">hair_type_preference</string>
+    <string name="key_dandruff">dandruff_preference</string>
+
+    <string name="skin_type">What\'s your skin type?"</string>
+    <string name="skin_specificities">Does your skin have any specificity?</string>
+    <string name="hair_type">What\'s your hair type?</string>
+    <string name="dandruff_checkbox_preference">Do you have dandruff?</string>
+    <string name="summary_dandruff_on">Yes</string>
+    <string name="summary_dandruff_off">No</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="action_new_recipe">New Recipe</string>
+    <string name="action_my_recipes">My Recipes</string>
+    <string name="action_ingredient_lookup">Ingredient Lookup</string>
+
+    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_my_recipes">My recipes</string>
+
+    <string name="pick_base">Pick your base</string>
+    <string name="base_ingredient">Base ingredient(s)</string>
+    <string name="add_ons">Add-ons</string>
+    <string name="pick">Pick</string>
+    <string name="save">Save</string>
+    <string name="clear">Clear</string>
+    <string name="confirm">Confirm</string>
+    <string name="shelf_life">Shelf life: %s</string>
+    <string name="select">Select the %s</string>
+
+    <string name="no_product">No product selected</string>
+    <string name="please_select">Please select a base ingredient</string>
+    <string name="saved">%s saved</string>
+
+</resources>
