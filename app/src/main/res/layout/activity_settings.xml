@@ -3,38 +3,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    style="@style/DrawerStyle"
     tools:openDrawer="start">
 
     <include layout="@layout/coordinator_layout"
         android:layout_height="match_parent"
         android:layout_width="match_parent"/>
 
-        <LinearLayout
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <View
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="?attr/actionBarSize"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"/>
+        <fragment
+            android:name="com.bazzillion.ingrid.shelfie.PreferenceFragment"
+            android:id="@+id/preference_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-               <fragment
-                   android:name="com.bazzillion.ingrid.shelfie.PreferenceFragment"
-                   android:id="@+id/preference_fragment"
-                   android:layout_width="match_parent"
-                   android:layout_height="match_parent" />
-
-        </LinearLayout>
+    </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        app:menu="@menu/activity_drawer" />
+        style="@style/NavigationViewStyle"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -3,9 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    style="@style/DrawerStyle"
     tools:openDrawer="start">
 
 
@@ -13,52 +11,48 @@
         android:layout_height="match_parent"
         android:layout_width="match_parent"/>
 
-        <LinearLayout
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <View
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="?attr/actionBarSize"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:id="@+id/base_fragment"/>
 
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:id="@+id/base_fragment"/>
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@color/colorAccent"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/base_fragment"
+                android:id="@+id/add_on_fragment"/>
 
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:background="@color/colorAccent"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@id/base_fragment"
-                    android:id="@+id/add_on_fragment"/>
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:id="@+id/pick_ingredient_fragment">
 
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentEnd="true"
-                    android:id="@+id/pick_ingredient_fragment">
+            </FrameLayout>
 
-                </FrameLayout>
+        </RelativeLayout>
 
-            </RelativeLayout>
-
-        </LinearLayout>
+    </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        app:menu="@menu/activity_drawer" />
+        style="@style/NavigationViewStyle"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>

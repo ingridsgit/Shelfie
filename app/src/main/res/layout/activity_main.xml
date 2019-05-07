@@ -3,14 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:openDrawer="start">
+    tools:openDrawer="start"
+    style="@style/DrawerStyle">
 
-   <include layout="@layout/coordinator_layout"
-       android:layout_height="match_parent"
-       android:layout_width="match_parent"/>
+    <include layout="@layout/coordinator_layout"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -42,10 +40,6 @@
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        app:menu="@menu/activity_drawer" />
+        style="@style/NavigationViewStyle"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>
