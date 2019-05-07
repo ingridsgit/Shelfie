@@ -1,10 +1,12 @@
 package com.bazzillion.ingrid.shelfie;
 
 import android.os.Bundle;
-import androidx.fragment.app.FragmentActivity;
+
 import androidx.fragment.app.FragmentManager;
 
 import android.widget.Toast;
+
+import com.bazzillion.ingrid.shelfie.Adapters.BaseAdapter;
 
 public class NewRecipeActivity extends DrawerActivity implements BaseAdapter.BaseClickHandler {
 
