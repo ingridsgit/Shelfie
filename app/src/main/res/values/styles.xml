@@ -26,4 +26,19 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
+    <style name="NavigationViewStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="headerLayout">@layout/nav_header</item>
+        <item name="menu">@menu/activity_drawer</item>
+    </style>
+
+    <style name="DrawerStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:fitsSystemWindows">true</item>
+    </style>
+
 </resources>

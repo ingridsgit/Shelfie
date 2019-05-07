@@ -43,9 +43,9 @@ public class MyRecipesActivity extends DrawerActivity {
         LiveData<List<Recipe>> myRecipes = appDatabase.recipeDao().loadMyRecipes();
         if (myRecipes != null){
             List<String> myRecipeNames = new ArrayList<>();
-            for (Recipe recipe : myRecipes){
-                myRecipeNames.add(recipe.getName());
-            }
+//            for (Recipe recipe : myRecipes){
+//                myRecipeNames.add(recipe.getName());
+//            }
             recipeAdapter.addAll(myRecipeNames);
         }
 
