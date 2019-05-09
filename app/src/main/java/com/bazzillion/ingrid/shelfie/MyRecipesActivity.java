@@ -1,7 +1,9 @@
 package com.bazzillion.ingrid.shelfie;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.bazzillion.ingrid.shelfie.Adapters.RecipeAdapter;
 import com.bazzillion.ingrid.shelfie.Database.AppDatabase;
@@ -13,17 +15,19 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class MyRecipesActivity extends DrawerActivity {
+public class MyRecipesActivity extends DrawerActivity implements RecipeAdapter.RecipeClickListener {
 
     private RadioGroup radioGroup;
     private AppDatabase appDatabase;
     private RecyclerView recyclerView;
     private RecipeAdapter recipeAdapter;
     private LiveData<List<Recipe>> myRecipes;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +36,7 @@ public class MyRecipesActivity extends DrawerActivity {
         super.onCreateDrawer();
         appDatabase = AppDatabase.getInstance(getApplicationContext());
         recyclerView = findViewById(R.id.recipe_list_view);
-        recipeAdapter = new RecipeAdapter() {
+        recipeAdapter = new RecipeAdapter(this) {
 
 
         };
@@ -51,31 +55,22 @@ public class MyRecipesActivity extends DrawerActivity {
                     @Override
                     public void run() {
                         int position = viewHolder.getAdapterPosition();
-                        List<Recipe> recipes = recipeAdapter.getRecipes().getValue();
+                        List<Recipe> recipes = recipeAdapter.getRecipes();
                         appDatabase.recipeDao().deleteRecipe(recipes.get(position));
-                        updateRecipes();
                     }
                 });
 
             }
         }).attachToRecyclerView(recyclerView);
+        updateRecipes();
     }
 
     private void updateRecipes(){
-        AppExecutors.getInstance().getDiskIo().execute(new Runnable() {
+        myRecipes = appDatabase.recipeDao().loadMyRecipes();
+        myRecipes.observe(this, new Observer<List<Recipe>>() {
             @Override
-            public void run() {
-                myRecipes = appDatabase.recipeDao().loadMyRecipes();
-                if (myRecipes != null){
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            recipeAdapter.setRecipes(myRecipes);
-
-                        }
-                    });
-
-                }
+            public void onChanged(List<Recipe> recipes) {
+                recipeAdapter.setRecipes(recipes);
             }
         });
     }
@@ -83,7 +78,16 @@ public class MyRecipesActivity extends DrawerActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        updateRecipes();
+    }
+
+    @Override
+    public void onRecipeClick(int recipeId) {
+        Intent intent = new Intent(MyRecipesActivity.this, NewRecipeActivity.class);
+        intent.putExtra(NewRecipeActivity.KEY_ACTIVITY_MODE, NewRecipeActivity.UPDATE_RECIPE);
+        intent.putExtra(NewRecipeActivity.KEY_RECIPE_ID, recipeId);
+        Toast.makeText(this, String.valueOf(recipeId), Toast.LENGTH_LONG).show();
+        startActivity(intent);
+
     }
 
     //    @Override

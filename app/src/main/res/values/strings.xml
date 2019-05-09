@@ -98,5 +98,6 @@
     <string name="no_product">No product selected</string>
     <string name="please_select">Please select a base ingredient</string>
     <string name="saved">%s saved</string>
+    <string name="edit">Edit</string>
 
 </resources>

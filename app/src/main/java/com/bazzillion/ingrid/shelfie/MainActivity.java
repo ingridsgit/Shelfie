@@ -11,7 +11,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends DrawerActivity {
-    public static final String PRODUCT_TYPE = "product_type";
 
     private ListView productListView;
     private ArrayAdapter<String> productArrayAdapter;
@@ -34,7 +33,7 @@ public class MainActivity extends DrawerActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent intent = new Intent(MainActivity.this, NewRecipeActivity.class);
-                    intent.putExtra(PRODUCT_TYPE, getResources().getStringArray(R.array.product_array)[position]);
+                    intent.putExtra(NewRecipeActivity.KEY_PRODUCT_TYPE, getResources().getStringArray(R.array.product_array)[position]);
                     startActivity(intent);
                 }
             });

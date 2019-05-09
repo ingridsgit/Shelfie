@@ -5,6 +5,10 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.room.util.StringUtil;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,13 +19,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bazzillion.ingrid.shelfie.Database.AppDatabase;
+import com.bazzillion.ingrid.shelfie.Database.AppExecutors;
 import com.bazzillion.ingrid.shelfie.Database.Recipe;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -67,6 +75,8 @@ public class AddOnFragment extends Fragment {
     private List<String> selectedCompulsory = new ArrayList<>();
     private List<String> selectedOptional = new ArrayList<>();
     private AppDatabase appDatabase;
+    private int recipeId;
+    private LiveData<Recipe> currentRecipe;
 
     public AddOnFragment(){
 
@@ -80,6 +90,15 @@ public class AddOnFragment extends Fragment {
         return fragment;
     }
 
+    public static AddOnFragment newInstance(String baseName, int recipeId) {
+        Bundle args = new Bundle();
+        args.putString(KEY_BASE_NAME, baseName);
+        args.putInt(NewRecipeActivity.KEY_RECIPE_ID, recipeId);
+        AddOnFragment fragment = new AddOnFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,30 +106,45 @@ public class AddOnFragment extends Fragment {
         appDatabase = AppDatabase.getInstance(getContext());
         if (savedInstanceState == null) {
             if (getArguments() != null) {
+                if (getArguments().containsKey(NewRecipeActivity.KEY_RECIPE_ID)){ // activityMode == Update
+                    recipeId = getArguments().getInt(NewRecipeActivity.KEY_RECIPE_ID);
+                    currentRecipe = AppDatabase.getInstance(getContext()).recipeDao().getRecipeById(recipeId);
+                    currentRecipe.observe(this, new Observer<Recipe>() {
+                        @Override
+                        public void onChanged(Recipe recipe) {
+                            selectedCompulsory = convertStringToList(recipe.getPrimaryIngredients());
+                            selectedOptional = convertStringToList(recipe.getAddOns());
+                        }
+                    });
+
+
+                }
+
                 baseName = getArguments().getString(KEY_BASE_NAME);
                 firebaseDatabase.getReference().child(FIREBASE_KEY_BASE).child(baseName)
-                        .addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                selectedBase = dataSnapshot.getValue(Base.class);
-                                if (selectedBase != null){
-                                    selectedBase.name = dataSnapshot.getKey();
-                                    updateUi();
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    selectedBase = dataSnapshot.getValue(Base.class);
+                                    if (selectedBase != null){
+                                        selectedBase.name = dataSnapshot.getKey();
+                                        updateUi();
+                                    }
                                 }
-                            }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                Toast.makeText(getContext(), databaseError.getMessage(), Toast.LENGTH_LONG).show();
-                            }
-                        });
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    Toast.makeText(getContext(), databaseError.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            });
+
             }
         } else {
-            selectedBase = savedInstanceState.getParcelable(KEY_BASE);
-            selectedCompulsory = savedInstanceState.getStringArrayList(KEY_SELECTED_COMPULSORY);
-            selectedOptional = savedInstanceState.getStringArrayList(KEY_SELECTED_OPTIONAL);
-            ingredientListView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_INGREDIENT_ADAPTER));
-            addOnListView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_ADD_ON_ADAPTER));
+                selectedBase = savedInstanceState.getParcelable(KEY_BASE);
+                selectedCompulsory = savedInstanceState.getStringArrayList(KEY_SELECTED_COMPULSORY);
+                selectedOptional = savedInstanceState.getStringArrayList(KEY_SELECTED_OPTIONAL);
+                ingredientListView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_INGREDIENT_ADAPTER));
+                addOnListView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_ADD_ON_ADAPTER));
 
         }
 
@@ -126,47 +160,62 @@ public class AddOnFragment extends Fragment {
         addOnListView = view.findViewById(R.id.add_on_list_view);
         pickAddOnButton = view.findViewById(R.id.pick_add_on_button);
         saveButton = view.findViewById(R.id.save_button);
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (selectedBase != null){
-                    // check that the user has selected the compulsory ingredients
-                    if (ingredientArrayAdapter.isEmpty()){
-                        Toast.makeText(getContext(), R.string.please_select, Toast.LENGTH_LONG).show();
+        if (getArguments() != null && getArguments().containsKey(NewRecipeActivity.KEY_RECIPE_ID)) { // activityMode == Update
+            pickIngredientButton.setVisibility(View.GONE);
+            pickAddOnButton.setVisibility(View.GONE);
+            saveButton.setText(R.string.edit);
+            //TODO open activity to edit the recipe and update
+        } else { // activityMode == Create
+            pickIngredientButton.setVisibility(View.VISIBLE);
+            pickAddOnButton.setVisibility(View.VISIBLE);
+            saveButton.setText(R.string.save);
+            saveButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (selectedBase != null){
+                        // check that the user has selected the compulsory ingredients
+                        if (ingredientArrayAdapter.isEmpty()){
+                            Toast.makeText(getContext(), R.string.please_select, Toast.LENGTH_LONG).show();
+                        } else {
+                            // get the list of all compulsory ingredients, either pre selected or selected by the user
+
+                            List<String> myPrimaryIngredients = new ArrayList<>();
+                            if (selectedBase.primaryIngredients != null){
+                                myPrimaryIngredients.addAll(selectedBase.primaryIngredients);
+                            }
+                            if (selectedCompulsory != null){
+                                myPrimaryIngredients.addAll(selectedCompulsory);
+                            }
+
+                            String myAddOns = null;
+                            if (selectedOptional != null){
+                                myAddOns = convertListToString(selectedOptional);
+                            }
+
+
+
+                            //TODO: open prompt to edit the recipe name. auto populate with 'my' + base name in lower case
+                            final Recipe recipe = new Recipe("MY FIRST RECIPE",
+                                    selectedBase.name,
+                                    convertListToString(myPrimaryIngredients),
+                                    myAddOns);
+                            AppExecutors.getInstance().getDiskIo().execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    appDatabase.recipeDao().insertNewRecipe(recipe);
+                                }
+                            });
+                            Toast.makeText(getContext(), getResources().getString(R.string.saved, "MY FIRST RECIPE") , Toast.LENGTH_LONG).show();
+                            getActivity().finish();
+                        }
+
                     } else {
-                        // get the list of all compulsory ingredients, either pre selected or selected by the user
-
-                        List<String> myPrimaryIngredients = new ArrayList<>();
-                        if (selectedBase.primaryIngredients != null){
-                            myPrimaryIngredients.addAll(selectedBase.primaryIngredients);
-                        }
-                        if (selectedCompulsory != null){
-                            myPrimaryIngredients.addAll(selectedCompulsory);
-                        }
-
-                        String myAddOns = null;
-                        if (selectedOptional != null){
-                            myAddOns = convertListToString(selectedOptional);
-                        }
-
-
-
-                        //TODO: open prompt to edit the recipe name. auto populate with 'my' + base name in lower case
-                        Recipe recipe = new Recipe("MY FIRST RECIPE",
-                                selectedBase.name,
-                                convertListToString(myPrimaryIngredients),
-                                myAddOns);
-
-                        appDatabase.recipeDao().insertNewRecipe(recipe);
-                        Toast.makeText(getContext(), getResources().getString(R.string.saved, "MY FIRST RECIPE") , Toast.LENGTH_LONG).show();
-                        getActivity().finish();
+                        Toast.makeText(getContext(), R.string.no_product, Toast.LENGTH_LONG).show();
                     }
-
-                } else {
-                    Toast.makeText(getContext(), R.string.no_product, Toast.LENGTH_LONG).show();
                 }
-            }
-        });
+            });
+        }
+
         shelfLifeTextView = view.findViewById(R.id.shelf_life_text_view);
         if (savedInstanceState != null && selectedBase != null){
 //            ingredientListView.onRestoreInstanceState(savedInstanceState.getParcelable("ADAPTER"));
@@ -187,11 +236,18 @@ public class AddOnFragment extends Fragment {
         return stringBuilder.toString();
     }
 
+    private List<String> convertStringToList(String string){
+        String[] stringArray = StringUtils.split(string, SEPARATOR);
+        return new ArrayList<>(Arrays.asList(stringArray));
+    }
+
     private void updateUi(){
         descriptionView.setText(selectedBase.description);
         shelfLifeTextView.setText(getString(R.string.shelf_life, selectedBase.shelfLife));
         ingredientArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
-        if (selectedBase.primaryIngredients != null){
+        if (getArguments() != null && getArguments().containsKey(NewRecipeActivity.KEY_RECIPE_ID)){ // activityMode == Update
+            ingredientArrayAdapter.addAll(selectedCompulsory);
+        } else if (selectedBase.primaryIngredients != null){ // activityMode == Create && there are primary ingredients
             ingredientArrayAdapter.addAll(selectedBase.primaryIngredients);
             if (!ingredientArrayAdapter.isEmpty()){
                 pickIngredientButton.setVisibility(View.GONE);
@@ -260,15 +316,14 @@ public class AddOnFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (baseName != null){
-            outState.putString(KEY_BASE_NAME, baseName);
-        }
-        outState.putParcelable(KEY_BASE, selectedBase);
+            if (baseName != null){
+                outState.putString(KEY_BASE_NAME, baseName);
+            }
+            outState.putParcelable(KEY_BASE, selectedBase);
+            outState.putStringArrayList(KEY_SELECTED_COMPULSORY, (ArrayList<String>) selectedCompulsory);
+            outState.putStringArrayList(KEY_SELECTED_OPTIONAL, (ArrayList<String>) selectedOptional);
         outState.putParcelable(KEY_INGREDIENT_ADAPTER, ingredientListView.onSaveInstanceState());
         outState.putParcelable(KEY_ADD_ON_ADAPTER, addOnListView.onSaveInstanceState());
-        outState.putStringArrayList(KEY_SELECTED_COMPULSORY, (ArrayList<String>) selectedCompulsory);
-        outState.putStringArrayList(KEY_SELECTED_OPTIONAL, (ArrayList<String>) selectedOptional);
-
 
     }
 
