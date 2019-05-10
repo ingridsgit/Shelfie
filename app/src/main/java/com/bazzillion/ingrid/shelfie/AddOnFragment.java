@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.room.util.StringUtil;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,8 @@ import android.widget.Toast;
 import com.bazzillion.ingrid.shelfie.Database.AppDatabase;
 import com.bazzillion.ingrid.shelfie.Database.AppExecutors;
 import com.bazzillion.ingrid.shelfie.Database.Recipe;
+import com.bazzillion.ingrid.shelfie.Database.SingleRecipeViewModel;
+import com.bazzillion.ingrid.shelfie.Database.SingleRecipeViewModelFactory;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -108,17 +111,20 @@ public class AddOnFragment extends Fragment {
             if (getArguments() != null) {
                 if (getArguments().containsKey(NewRecipeActivity.KEY_RECIPE_ID)){ // activityMode == Update
                     recipeId = getArguments().getInt(NewRecipeActivity.KEY_RECIPE_ID);
-                    currentRecipe = AppDatabase.getInstance(getContext()).recipeDao().getRecipeById(recipeId);
+                    SingleRecipeViewModelFactory singleRecipeVMFactory = new SingleRecipeViewModelFactory(appDatabase, recipeId);
+                    SingleRecipeViewModel singleRecipeViewModel = singleRecipeVMFactory.create(SingleRecipeViewModel.class);
+                    currentRecipe = singleRecipeViewModel.getRecipe();
                     currentRecipe.observe(this, new Observer<Recipe>() {
                         @Override
                         public void onChanged(Recipe recipe) {
+                            currentRecipe.removeObserver(this);
                             selectedCompulsory = convertStringToList(recipe.getPrimaryIngredients());
                             selectedOptional = convertStringToList(recipe.getAddOns());
                         }
                     });
-
-
                 }
+
+                // retrieve the Base from FirebaseDatabase with its name
 
                 baseName = getArguments().getString(KEY_BASE_NAME);
                 firebaseDatabase.getReference().child(FIREBASE_KEY_BASE).child(baseName)
@@ -127,7 +133,6 @@ public class AddOnFragment extends Fragment {
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     selectedBase = dataSnapshot.getValue(Base.class);
                                     if (selectedBase != null){
-                                        selectedBase.name = dataSnapshot.getKey();
                                         updateUi();
                                     }
                                 }
@@ -143,8 +148,8 @@ public class AddOnFragment extends Fragment {
                 selectedBase = savedInstanceState.getParcelable(KEY_BASE);
                 selectedCompulsory = savedInstanceState.getStringArrayList(KEY_SELECTED_COMPULSORY);
                 selectedOptional = savedInstanceState.getStringArrayList(KEY_SELECTED_OPTIONAL);
-                ingredientListView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_INGREDIENT_ADAPTER));
-                addOnListView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_ADD_ON_ADAPTER));
+//                ingredientListView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_INGREDIENT_ADAPTER));
+
 
         }
 
@@ -154,21 +159,12 @@ public class AddOnFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_on, container, false);
-        descriptionView = view.findViewById(R.id.base_description_text_view);
-        ingredientListView = view.findViewById(R.id.base_ingredient_list_view);
-        pickIngredientButton = view.findViewById(R.id.pick_base_ingredient_button);
-        addOnListView = view.findViewById(R.id.add_on_list_view);
-        pickAddOnButton = view.findViewById(R.id.pick_add_on_button);
-        saveButton = view.findViewById(R.id.save_button);
+        bindViews(view);
         if (getArguments() != null && getArguments().containsKey(NewRecipeActivity.KEY_RECIPE_ID)) { // activityMode == Update
-            pickIngredientButton.setVisibility(View.GONE);
-            pickAddOnButton.setVisibility(View.GONE);
-            saveButton.setText(R.string.edit);
+            setUpdateUI();
             //TODO open activity to edit the recipe and update
         } else { // activityMode == Create
-            pickIngredientButton.setVisibility(View.VISIBLE);
-            pickAddOnButton.setVisibility(View.VISIBLE);
-            saveButton.setText(R.string.save);
+            setCreateUI();
             saveButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -215,30 +211,34 @@ public class AddOnFragment extends Fragment {
                 }
             });
         }
-
-        shelfLifeTextView = view.findViewById(R.id.shelf_life_text_view);
         if (savedInstanceState != null && selectedBase != null){
-//            ingredientListView.onRestoreInstanceState(savedInstanceState.getParcelable("ADAPTER"));
+            ingredientListView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_INGREDIENT_ADAPTER));
+            addOnListView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_ADD_ON_ADAPTER));
             updateUi();
         }
         return view;
     }
 
-    private String convertListToString(List<String> list){
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0 ; i <list.size() ; i++) {
-            stringBuilder.append(list.get(i));
-            // Do not append comma at the end of last element
-            if( i < list.size() -1){
-                stringBuilder.append(SEPARATOR);
-            }
-        }
-        return stringBuilder.toString();
+    private void bindViews(View view){
+        descriptionView = view.findViewById(R.id.base_description_text_view);
+        ingredientListView = view.findViewById(R.id.base_ingredient_list_view);
+        pickIngredientButton = view.findViewById(R.id.pick_base_ingredient_button);
+        addOnListView = view.findViewById(R.id.add_on_list_view);
+        pickAddOnButton = view.findViewById(R.id.pick_add_on_button);
+        saveButton = view.findViewById(R.id.save_button);
+        shelfLifeTextView = view.findViewById(R.id.shelf_life_text_view);
     }
 
-    private List<String> convertStringToList(String string){
-        String[] stringArray = StringUtils.split(string, SEPARATOR);
-        return new ArrayList<>(Arrays.asList(stringArray));
+    private void setUpdateUI(){
+        pickIngredientButton.setVisibility(View.GONE);
+        pickAddOnButton.setVisibility(View.GONE);
+        saveButton.setText(R.string.edit);
+    }
+
+    private void setCreateUI(){
+        pickIngredientButton.setVisibility(View.VISIBLE);
+        pickAddOnButton.setVisibility(View.VISIBLE);
+        saveButton.setText(R.string.save);
     }
 
     private void updateUi(){
@@ -306,6 +306,23 @@ public class AddOnFragment extends Fragment {
                 addOnAdapter.addAll(selectedOptional);
             }
         }
+    }
+
+    private String convertListToString(List<String> list){
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0 ; i <list.size() ; i++) {
+            stringBuilder.append(list.get(i));
+            // Do not append comma at the end of last element
+            if( i < list.size() -1){
+                stringBuilder.append(SEPARATOR);
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    private List<String> convertStringToList(String string){
+        String[] stringArray = StringUtils.split(string, SEPARATOR);
+        return new ArrayList<>(Arrays.asList(stringArray));
     }
 
     @Override
