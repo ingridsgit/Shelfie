@@ -5,19 +5,14 @@ import android.os.Bundle;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
 
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.bazzillion.ingrid.shelfie.Adapters.BaseAdapter;
-import com.bazzillion.ingrid.shelfie.Database.AppDatabase;
-import com.bazzillion.ingrid.shelfie.Database.AppExecutors;
 import com.bazzillion.ingrid.shelfie.Database.Recipe;
-import com.bazzillion.ingrid.shelfie.Database.SingleRecipeViewModel;
-import com.bazzillion.ingrid.shelfie.Database.SingleRecipeViewModelFactory;
+import com.bazzillion.ingrid.shelfie.Database.Repository;
 
 public class NewRecipeActivity extends DrawerActivity implements BaseAdapter.BaseClickHandler {
 
@@ -49,22 +44,19 @@ public class NewRecipeActivity extends DrawerActivity implements BaseAdapter.Bas
 
             if (activityMode == UPDATE_RECIPE){
                 recipeId = getIntent().getIntExtra(KEY_RECIPE_ID, 1);
-                SingleRecipeViewModelFactory singleRecipeViewModelFactory =
-                        new SingleRecipeViewModelFactory(AppDatabase.getInstance(this), recipeId);
-                final SingleRecipeViewModel singleRecipeViewModel =
-                        ViewModelProviders.of(this, singleRecipeViewModelFactory)
-                                .get(SingleRecipeViewModel.class);
-                singleRecipeViewModel.getRecipe().observe(this, new Observer<Recipe>() {
+                final LiveData<Recipe> currentRecipe = Repository.getInstance(this).getRecipeById(this, recipeId);
+                currentRecipe.observe(this, new Observer<Recipe>() {
                     @Override
                     public void onChanged(Recipe recipe) {
-                        singleRecipeViewModel.getRecipe().removeObserver(this);
-                        baseName = recipe.getBaseName();
+                        currentRecipe.removeObserver(this);
+                        String baseName = recipe.getBaseName();
                         fragmentManager.beginTransaction().replace(R.id.add_on_fragment,
                                 AddOnFragment.newInstance(baseName, recipeId))
                                 .commit();
                         setTitle(baseName);
                     }
                 });
+
             } else {
                 fragmentManager.beginTransaction().replace(R.id.base_fragment, BaseFragment.newInstance(productType))
                         .commit();

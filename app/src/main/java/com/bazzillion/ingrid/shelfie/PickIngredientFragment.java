@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.bazzillion.ingrid.shelfie.Adapters.IngredientPickerAdapter;
+import com.bazzillion.ingrid.shelfie.Database.Repository;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -40,8 +41,6 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
     private static final String KEY_DESCRIPTION = "description";
     private static final String KEY_PROPERTIES = "properties";
     private static final String KEY_SELECTION = "selection";
-    private static final String FIREBASE_KEY_TYPE = "type";
-    private static final String FIREBASE_KEY_INGREDIENT = "Ingredient";
     private Base selectedBase;
     private int isOptional;
     private TextView nameTextView;
@@ -57,7 +56,6 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
     private IngredientPickerAdapter ingredientPickerAdapter;
     private List<String> ingredientTypes = new ArrayList<>();
     private ValueEventListener typeEventListener;
-    private DatabaseReference databaseReference;
     private int i;
     private Button confirmButton;
 
@@ -106,22 +104,19 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
         nameTextView = view.findViewById(R.id.ingredient_name_tv);
         confirmButton = view.findViewById(R.id.confirm_button);
 
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference();
+
         updateRecyclerView();
         if (savedInstanceState == null && selectedBase != null) {
             List<String> addOnTypes;
             switch (isOptional) {
                 case AddOnFragment.COMPULSORY_ADD_ON:
                     addOnTypes = selectedBase.compulsoryAddOns;
-                    i = 0;
-                    queryFirebaseBeforeUpdate(databaseReference, addOnTypes);
+                    Repository.getInstance(getContext()).queryFirebaseBeforeUpdate(addOnTypes, selectedBase.product);
                     break;
                 case AddOnFragment.OPTIONAL_ADD_ON:
                 default:
                     addOnTypes = selectedBase.optionalAddOns;
-                    i = 0;
-                    queryFirebaseBeforeUpdate(databaseReference, addOnTypes);
+                    Repository.getInstance(getContext()).queryFirebaseBeforeUpdate(addOnTypes, selectedBase.product);
                     break;
             }
         } else {
@@ -153,7 +148,7 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
     private void updateRecyclerView() {
         ingredientPickerAdapter = new IngredientPickerAdapter(getContext(), ingredientTypes, this);
         ingredientPickerAdapter.setIngredientLists(ingredientLists);
-        linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setSaveEnabled(true);
         recyclerView.setSaveFromParentEnabled(true);
@@ -161,54 +156,7 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
     }
 
 
-    private void queryFirebaseBeforeUpdate(final DatabaseReference databaseReference, final List<String> addOnTypes) {
-        databaseReference.child(FIREBASE_KEY_TYPE).child(addOnTypes.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                final List<String> ingredients = (List<String>) dataSnapshot.getValue();
-                if (ingredients != null) {
-                    databaseReference.child(FIREBASE_KEY_INGREDIENT).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            List<String> myList = new ArrayList<>();
-                            for (String ingredient : ingredients) {
-                                boolean isForProduct = dataSnapshot.child(ingredient).child("forProduct").child(selectedBase.product).getValue() != null;
-                                boolean isForUser;
-                                if (hairType != null) {
-                                    isForUser = dataSnapshot.child(ingredient).child("skinType").child(hairType).getValue() != null;
-                                } else {
-                                    isForUser = true;
-                                }
 
-                                if (isForProduct && isForUser) {
-                                    myList.add(ingredient);
-                                }
-                            }
-                            if (!myList.isEmpty()) {
-                                ingredientLists.add(myList);
-                                ingredientTypes.add(addOnTypes.get(i));
-
-                            }
-                            i++;
-                            if (i < addOnTypes.size()) {
-                                queryFirebaseBeforeUpdate(databaseReference, addOnTypes);
-                            } else {
-                                ingredientPickerAdapter.setIngredientLists(ingredientLists);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-    }
 
     private String getPreferenceByBodyPart(String bodyPart) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
@@ -245,23 +193,24 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
 
     @Override
     public void onIngredientClick(String ingredient) {
+        //TODO : fix
 
-        databaseReference.child(FIREBASE_KEY_INGREDIENT).child(ingredient).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                name = dataSnapshot.child("name").getValue().toString();
-                nameTextView.setText(name);
-                description = dataSnapshot.child("description").getValue().toString();
-                descriptionTextView.setText(description);
-                properties = dataSnapshot.child("properties").getValue().toString();
-                propertiesTextView.setText(properties);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+//        databaseReference.child(FIREBASE_KEY_INGREDIENT).child(ingredient).addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                name = dataSnapshot.child("name").getValue().toString();
+//                nameTextView.setText(name);
+//                description = dataSnapshot.child("description").getValue().toString();
+//                descriptionTextView.setText(description);
+//                properties = dataSnapshot.child("properties").getValue().toString();
+//                propertiesTextView.setText(properties);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
     }
 
     @Override
