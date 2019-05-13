@@ -1,5 +1,6 @@
 package com.bazzillion.ingrid.shelfie;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.RadioGroup;
@@ -9,6 +10,7 @@ import com.bazzillion.ingrid.shelfie.Database.AppDatabase;
 import com.bazzillion.ingrid.shelfie.Database.AppExecutors;
 import com.bazzillion.ingrid.shelfie.Database.MainViewModel;
 import com.bazzillion.ingrid.shelfie.Database.Recipe;
+import com.bazzillion.ingrid.shelfie.Database.Repository;
 
 import java.util.List;
 
@@ -23,10 +25,9 @@ import androidx.recyclerview.widget.RecyclerView;
 public class MyRecipesActivity extends DrawerActivity implements RecipeAdapter.RecipeClickListener {
 
     private RadioGroup radioGroup;
-    private AppDatabase appDatabase;
     private RecyclerView recyclerView;
     private RecipeAdapter recipeAdapter;
-    private LiveData<List<Recipe>> myRecipes;
+
 
 
     @Override
@@ -34,9 +35,8 @@ public class MyRecipesActivity extends DrawerActivity implements RecipeAdapter.R
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_recipes);
         super.onCreateDrawer();
-        appDatabase = AppDatabase.getInstance(getApplicationContext());
         setUpUi();
-        setUpViewModel();
+        Repository.getInstance(this).setUpViewModel(this, recipeAdapter);
     }
 
     private void setUpUi(){
@@ -53,28 +53,12 @@ public class MyRecipesActivity extends DrawerActivity implements RecipeAdapter.R
 
             @Override
             public void onSwiped(final @NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                AppExecutors.getInstance().getDiskIo().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        int position = viewHolder.getAdapterPosition();
-                        List<Recipe> recipes = recipeAdapter.getRecipes();
-                        appDatabase.recipeDao().deleteRecipe(recipes.get(position));
-                    }
-                });
+                int position = viewHolder.getAdapterPosition();
+                List<Recipe> recipes = recipeAdapter.getRecipes();
+                Repository.getInstance(MyRecipesActivity.this).deleteRecipe(recipes.get(position));
 
             }
         }).attachToRecyclerView(recyclerView);
-    }
-
-    private void setUpViewModel(){
-        MainViewModel mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        myRecipes = mainViewModel.getMyRecipes();
-        myRecipes.observe(this, new Observer<List<Recipe>>() {
-            @Override
-            public void onChanged(List<Recipe> recipes) {
-                recipeAdapter.setRecipes(recipes);
-            }
-        });
     }
 
     @Override

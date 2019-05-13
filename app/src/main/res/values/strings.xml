@@ -99,5 +99,6 @@
     <string name="please_select">Please select a base ingredient</string>
     <string name="saved">%s saved</string>
     <string name="edit">Edit</string>
+    <string name="try_again">\"Please try again\"</string>
 
 </resources>

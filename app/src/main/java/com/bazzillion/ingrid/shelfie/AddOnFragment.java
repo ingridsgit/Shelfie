@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.bazzillion.ingrid.shelfie.Database.AppDatabase;
 import com.bazzillion.ingrid.shelfie.Database.AppExecutors;
 import com.bazzillion.ingrid.shelfie.Database.Recipe;
+import com.bazzillion.ingrid.shelfie.Database.Repository;
 import com.bazzillion.ingrid.shelfie.Database.SingleRecipeViewModel;
 import com.bazzillion.ingrid.shelfie.Database.SingleRecipeViewModelFactory;
 import com.google.firebase.database.DataSnapshot;
@@ -55,7 +56,6 @@ public class AddOnFragment extends Fragment {
     private static final String KEY_COMPULSORY_ADD_ONS = "compulsory_add_ons";
     private static final String KEY_OPTIONAL_ADD_ONS = "optional_add_ons";
     private static final String KEY_SHELF_LIFE = "shelf_life";
-    private static final String FIREBASE_KEY_BASE = "base";
     private static final String FIREBASE_KEY_INGREDIENT = "Ingredient";
     private static final String SEPARATOR = "-,,,-";
     private String baseName;
@@ -105,15 +105,11 @@ public class AddOnFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        firebaseDatabase = FirebaseDatabase.getInstance();
-        appDatabase = AppDatabase.getInstance(getContext());
         if (savedInstanceState == null) {
             if (getArguments() != null) {
                 if (getArguments().containsKey(NewRecipeActivity.KEY_RECIPE_ID)){ // activityMode == Update
                     recipeId = getArguments().getInt(NewRecipeActivity.KEY_RECIPE_ID);
-                    SingleRecipeViewModelFactory singleRecipeVMFactory = new SingleRecipeViewModelFactory(appDatabase, recipeId);
-                    SingleRecipeViewModel singleRecipeViewModel = singleRecipeVMFactory.create(SingleRecipeViewModel.class);
-                    currentRecipe = singleRecipeViewModel.getRecipe();
+                    currentRecipe = Repository.getInstance(getContext()).getRecipeById(getActivity(), recipeId);
                     currentRecipe.observe(this, new Observer<Recipe>() {
                         @Override
                         public void onChanged(Recipe recipe) {
@@ -127,21 +123,12 @@ public class AddOnFragment extends Fragment {
                 // retrieve the Base from FirebaseDatabase with its name
 
                 baseName = getArguments().getString(KEY_BASE_NAME);
-                firebaseDatabase.getReference().child(FIREBASE_KEY_BASE).child(baseName)
-                            .addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    selectedBase = dataSnapshot.getValue(Base.class);
-                                    if (selectedBase != null){
-                                        updateUi();
-                                    }
-                                }
+                if (baseName != null){
+                    Repository.getInstance(getContext()).retrieveSingleBase(baseName, this);
+                } else {
+                    Toast.makeText(getContext(), R.string.try_again, Toast.LENGTH_LONG).show();
+                }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                    Toast.makeText(getContext(), databaseError.getMessage(), Toast.LENGTH_LONG).show();
-                                }
-                            });
 
             }
         } else {
@@ -192,15 +179,10 @@ public class AddOnFragment extends Fragment {
 
                             //TODO: open prompt to edit the recipe name. auto populate with 'my' + base name in lower case
                             final Recipe recipe = new Recipe("MY FIRST RECIPE",
-                                    selectedBase.name,
+                                    baseName,
                                     convertListToString(myPrimaryIngredients),
                                     myAddOns);
-                            AppExecutors.getInstance().getDiskIo().execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    appDatabase.recipeDao().insertNewRecipe(recipe);
-                                }
-                            });
+                            Repository.getInstance(getContext()).insertNewRecipe(recipe);
                             Toast.makeText(getContext(), getResources().getString(R.string.saved, "MY FIRST RECIPE") , Toast.LENGTH_LONG).show();
                             getActivity().finish();
                         }
@@ -239,6 +221,11 @@ public class AddOnFragment extends Fragment {
         pickIngredientButton.setVisibility(View.VISIBLE);
         pickAddOnButton.setVisibility(View.VISIBLE);
         saveButton.setText(R.string.save);
+    }
+
+    public void setSelectedBase(Base selectedBase) {
+        this.selectedBase = selectedBase;
+        updateUi();
     }
 
     private void updateUi(){
@@ -328,6 +315,7 @@ public class AddOnFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+        Repository.getInstance(getContext()).removeSingleBaseValueEventListener();
     }
 
     @Override

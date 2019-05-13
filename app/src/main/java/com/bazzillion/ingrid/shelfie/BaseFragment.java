@@ -2,23 +2,16 @@ package com.bazzillion.ingrid.shelfie;
 
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
+
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.bazzillion.ingrid.shelfie.Adapters.BaseAdapter;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.ArrayList;
+import com.bazzillion.ingrid.shelfie.Database.Repository;
 
 
 /**
@@ -32,13 +25,9 @@ import java.util.ArrayList;
 public class BaseFragment extends Fragment {
 
     private static final String ARG_PRODUCT_TYPE = "product_type";
-    private static final String FIREBASE_KEY_PRODUCT = "product";
     private String productType;
     private RecyclerView recyclerView;
-    private DatabaseReference dbReference;
     private BaseAdapter baseAdapter;
-    private ValueEventListener valueEventListener;
-
     private OnFragmentInteractionListener mListener;
 
     public BaseFragment() {
@@ -62,23 +51,8 @@ public class BaseFragment extends Fragment {
         }
 
         if (productType != null){
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            dbReference = database.getReference().child(FIREBASE_KEY_PRODUCT).child(productType);
             baseAdapter = new BaseAdapter((BaseAdapter.BaseClickHandler) getActivity());
-            valueEventListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    ArrayList<String> valueSet = (ArrayList<String>) dataSnapshot.getValue();
-                    baseAdapter.setBases(valueSet);
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Toast.makeText(getContext(), databaseError.getMessage(), Toast.LENGTH_LONG).show();
-                }
-
-            };
-            dbReference.addValueEventListener(valueEventListener);
+            Repository.getInstance(getContext()).retrieveBases(baseAdapter, productType, getContext());
         }
 
     }
@@ -99,7 +73,7 @@ public class BaseFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        dbReference.removeEventListener(valueEventListener);
+        Repository.getInstance(getContext()).removeBasesValueEventListener();
         mListener = null;
     }
 
