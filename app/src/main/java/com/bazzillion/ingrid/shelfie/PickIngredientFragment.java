@@ -19,7 +19,6 @@ import com.bazzillion.ingrid.shelfie.Database.Repository;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -41,6 +40,12 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
     private static final String KEY_DESCRIPTION = "description";
     private static final String KEY_PROPERTIES = "properties";
     private static final String KEY_SELECTION = "selection";
+    private static final String FIREBASE_KEY_INGREDIENT = "Ingredient";
+    private static final String FIREBASE_KEY_PRODUCT = "product";
+    private static final String FIREBASE_KEY_BASE = "base";
+    private static final String FIREBASE_KEY_TYPE = "type";
+    private static final String FIREBASE_KEY_FOR_PRODUCT = "forProduct";
+    private static final String FIREBASE_KEY_SKIN_TYPE = "skinType";
     private Base selectedBase;
     private int isOptional;
     private TextView nameTextView;
@@ -111,14 +116,14 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
             switch (isOptional) {
                 case AddOnFragment.COMPULSORY_ADD_ON:
                     addOnTypes = selectedBase.compulsoryAddOns;
-                    Repository.getInstance(getContext()).queryFirebaseBeforeUpdate(addOnTypes, selectedBase.product);
                     break;
                 case AddOnFragment.OPTIONAL_ADD_ON:
                 default:
                     addOnTypes = selectedBase.optionalAddOns;
-                    Repository.getInstance(getContext()).queryFirebaseBeforeUpdate(addOnTypes, selectedBase.product);
                     break;
             }
+            i = 0;
+            Repository.getInstance(getContext()).getMatchingIngredients(i, addOnTypes, this, selectedBase.product, hairType);
         } else {
             ingredientPickerAdapter.setSelectedIngredients((Map<Integer, String>)savedInstanceState.getSerializable(KEY_SELECTION));
             name = savedInstanceState.getString(KEY_NAME);
@@ -157,6 +162,20 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
 
 
 
+    public void setMatchinIngredients(List<String> myList, List<String> addOnTypes){
+        if (!myList.isEmpty()) {
+            ingredientLists.add(myList);
+            ingredientTypes.add(addOnTypes.get(i));
+
+        }
+        i++;
+        if (i < addOnTypes.size()) {
+            Repository.getInstance(getContext()).getMatchingIngredients(i, addOnTypes, this, selectedBase.product, hairType);
+        } else {
+            ingredientPickerAdapter.setIngredientLists(ingredientLists);
+        }
+    }
+
 
     private String getPreferenceByBodyPart(String bodyPart) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
@@ -192,25 +211,14 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
 //    }
 
     @Override
-    public void onIngredientClick(String ingredient) {
-        //TODO : fix
+    public void onIngredientClick(String ingredientName) {
+        Repository.getInstance(getContext()).getIngredientByName(this, ingredientName);
+    }
 
-//        databaseReference.child(FIREBASE_KEY_INGREDIENT).child(ingredient).addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                name = dataSnapshot.child("name").getValue().toString();
-//                nameTextView.setText(name);
-//                description = dataSnapshot.child("description").getValue().toString();
-//                descriptionTextView.setText(description);
-//                properties = dataSnapshot.child("properties").getValue().toString();
-//                propertiesTextView.setText(properties);
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
+    public void populateIngredientDetails(Ingredient ingredient){
+        nameTextView.setText(ingredient.name);
+        descriptionTextView.setText(ingredient.description);
+        propertiesTextView.setText(ingredient.properties);
     }
 
     @Override

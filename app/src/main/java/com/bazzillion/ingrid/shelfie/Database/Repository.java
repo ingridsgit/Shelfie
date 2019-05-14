@@ -13,6 +13,8 @@ import com.bazzillion.ingrid.shelfie.Adapters.BaseAdapter;
 import com.bazzillion.ingrid.shelfie.Adapters.RecipeAdapter;
 import com.bazzillion.ingrid.shelfie.AddOnFragment;
 import com.bazzillion.ingrid.shelfie.Base;
+import com.bazzillion.ingrid.shelfie.Ingredient;
+import com.bazzillion.ingrid.shelfie.PickIngredientFragment;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,11 +34,14 @@ public class Repository {
     private ValueEventListener basesValueEventListener;
     private DatabaseReference singleBaseDbReference;
     private ValueEventListener singleBaseVEListener;
-
+    private List<String> ingredients;
+    private int j;
+    private static final String FIREBASE_KEY_INGREDIENT = "Ingredient";
     private static final String FIREBASE_KEY_PRODUCT = "product";
     private static final String FIREBASE_KEY_BASE = "base";
     private static final String FIREBASE_KEY_TYPE = "type";
-    private static final String FIREBASE_KEY_INGREDIENT = "Ingredient";
+    private static final String FIREBASE_KEY_FOR_PRODUCT = "forProduct";
+    private static final String FIREBASE_KEY_SKIN_TYPE = "skinType";
 
     public Repository(Context context){
         appDatabase = AppDatabase.getInstance(context);
@@ -138,11 +143,30 @@ public class Repository {
         singleBaseDbReference.removeEventListener(singleBaseVEListener);
     }
 
-    public void queryFirebaseBeforeUpdate(final List<String> addOnTypes, final String product) {
+
+
+    public void getIngredientByName(final PickIngredientFragment pickIngredientFragment, String ingredientName){
+        database = FirebaseDatabase.getInstance();
+        DatabaseReference ingredientDbReference = database.getReference().child(FIREBASE_KEY_INGREDIENT).child(ingredientName);
+        ValueEventListener ingredientVEListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Ingredient ingredient = (Ingredient) dataSnapshot.getValue();
+                pickIngredientFragment.populateIngredientDetails(ingredient);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        ingredientDbReference.addListenerForSingleValueEvent(ingredientVEListener);
+    }
+
+    public void getMatchingIngredients(int i, final List<String> addOnTypes, final PickIngredientFragment pickIngredientFragment, final String product, final String hairType) {
         database = FirebaseDatabase.getInstance();
         final DatabaseReference databaseReference = database.getReference();
-        int i = 0;
-        databaseReference.child(FIREBASE_KEY_TYPE).child(addOnTypes.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
+                databaseReference.child(FIREBASE_KEY_TYPE).child(addOnTypes.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 final List<String> ingredients = (List<String>) dataSnapshot.getValue();
@@ -150,32 +174,22 @@ public class Repository {
                     databaseReference.child(FIREBASE_KEY_INGREDIENT).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            //TODO : fix
-//                            List<String> myList = new ArrayList<>();
-//                            for (String ingredient : ingredients) {
-//                                boolean isForProduct = dataSnapshot.child(ingredient).child("forProduct").child(product).getValue() != null;
-//                                boolean isForUser;
-//                                if (hairType != null) {
-//                                    isForUser = dataSnapshot.child(ingredient).child("skinType").child(hairType).getValue() != null;
-//                                } else {
-//                                    isForUser = true;
-//                                }
-//
-//                                if (isForProduct && isForUser) {
-//                                    myList.add(ingredient);
-//                                }
-//                            }
-//                            if (!myList.isEmpty()) {
-//                                ingredientLists.add(myList);
-//                                ingredientTypes.add(addOnTypes.get(i));
-//
-//                            }
-//                            i++;
-//                            if (i < addOnTypes.size()) {
-//                                queryFirebaseBeforeUpdate(databaseReference, addOnTypes);
-//                            } else {
-//                                ingredientPickerAdapter.setIngredientLists(ingredientLists);
-//                            }
+                            List<String> myList = new ArrayList<>();
+                            for (String ingredient : ingredients) {
+                                boolean isForProduct = dataSnapshot.child(ingredient).child("forProduct").child(product).getValue() != null;
+                                boolean isForUser;
+                                if (hairType != null) {
+                                    isForUser = dataSnapshot.child(ingredient).child("skinType").child(hairType).getValue() != null;
+                                } else {
+                                    isForUser = true;
+                                }
+
+                                if (isForProduct && isForUser) {
+                                    myList.add(ingredient);
+                                }
+                                pickIngredientFragment.setMatchinIngredients(myList, addOnTypes);
+                            }
+
                         }
 
                         @Override
