@@ -1,6 +1,7 @@
 package com.bazzillion.ingrid.shelfie.Database;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -42,6 +43,9 @@ public class Repository {
     private static final String FIREBASE_KEY_TYPE = "type";
     private static final String FIREBASE_KEY_FOR_PRODUCT = "forProduct";
     private static final String FIREBASE_KEY_SKIN_TYPE = "skinType";
+    private static final String FIREBASE_KEY_NAME = "name";
+    private static final String FIREBASE_KEY_PROPERTIES = "properties";
+    private static final String FIREBASE_KEY_DESCRIPTION = "description";
 
     public Repository(Context context){
         appDatabase = AppDatabase.getInstance(context);
@@ -151,8 +155,10 @@ public class Repository {
         ValueEventListener ingredientVEListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Ingredient ingredient = (Ingredient) dataSnapshot.getValue();
-                pickIngredientFragment.populateIngredientDetails(ingredient);
+                String name = dataSnapshot.child(FIREBASE_KEY_NAME).getValue().toString();
+                String properties = dataSnapshot.child(FIREBASE_KEY_PROPERTIES).getValue().toString();
+                String description = dataSnapshot.child(FIREBASE_KEY_DESCRIPTION).getValue().toString();
+                pickIngredientFragment.populateIngredientDetails(name, properties, description);
             }
 
             @Override
@@ -176,10 +182,10 @@ public class Repository {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             List<String> myList = new ArrayList<>();
                             for (String ingredient : ingredients) {
-                                boolean isForProduct = dataSnapshot.child(ingredient).child("forProduct").child(product).getValue() != null;
+                                boolean isForProduct = dataSnapshot.child(ingredient).child(FIREBASE_KEY_FOR_PRODUCT).child(product).getValue() != null;
                                 boolean isForUser;
                                 if (hairType != null) {
-                                    isForUser = dataSnapshot.child(ingredient).child("skinType").child(hairType).getValue() != null;
+                                    isForUser = dataSnapshot.child(ingredient).child(FIREBASE_KEY_SKIN_TYPE).child(hairType).getValue() != null;
                                 } else {
                                     isForUser = true;
                                 }
@@ -187,8 +193,8 @@ public class Repository {
                                 if (isForProduct && isForUser) {
                                     myList.add(ingredient);
                                 }
-                                pickIngredientFragment.setMatchinIngredients(myList, addOnTypes);
                             }
+                            pickIngredientFragment.setMatchinIngredients(myList, addOnTypes);
 
                         }
 

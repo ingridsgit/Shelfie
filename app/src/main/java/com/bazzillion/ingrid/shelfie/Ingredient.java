@@ -11,13 +11,13 @@ public class Ingredient {
     public String type;
     public String description;
     public String properties;
-    public List<String> forProduct;
-    public List<String> skinType;
-    public List<String> specificity;
+    public List<Boolean> forProduct;
+    public List<Boolean> skinType;
+    public List<Boolean> specificity;
 
     public Ingredient(){}
 
-    public Ingredient(String name, String type, String description, String properties, List<String> forProduct, List<String> skinType, List<String> specificity){
+    public Ingredient(String name, String type, String description, String properties, List<Boolean> forProduct, List<Boolean> skinType, List<Boolean> specificity){
         this.name = name;
         this.type = type;
         this.description = description;
