@@ -100,5 +100,6 @@
     <string name="saved">%s saved</string>
     <string name="edit">Edit</string>
     <string name="try_again">Please try again</string>
+    <string name="type_recipe_name">Choose a name for your recipe</string>
 
 </resources>

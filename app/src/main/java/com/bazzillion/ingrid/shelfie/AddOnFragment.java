@@ -1,9 +1,11 @@
 package com.bazzillion.ingrid.shelfie;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
@@ -15,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -162,7 +165,7 @@ public class AddOnFragment extends Fragment {
                         } else {
                             // get the list of all compulsory ingredients, either pre selected or selected by the user
 
-                            List<String> myPrimaryIngredients = new ArrayList<>();
+                            final List<String> myPrimaryIngredients = new ArrayList<>();
                             if (selectedBase.primaryIngredients != null){
                                 myPrimaryIngredients.addAll(selectedBase.primaryIngredients);
                             }
@@ -170,21 +173,23 @@ public class AddOnFragment extends Fragment {
                                 myPrimaryIngredients.addAll(selectedCompulsory);
                             }
 
-                            String myAddOns = null;
-                            if (selectedOptional != null){
-                                myAddOns = convertListToString(selectedOptional);
-                            }
 
 
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            final EditText editText = new EditText(getContext());
+                            builder.setView(editText)
+                                    .setTitle(R.string.type_recipe_name)
+                                    .setCancelable(true)
+                                    .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            String recipeName = editText.getText().toString().trim();
+                                            saveRecipe(recipeName, myPrimaryIngredients);
+                                            Toast.makeText(getContext(), getResources().getString(R.string.saved, recipeName) , Toast.LENGTH_LONG).show();
+                                            getActivity().finish();
+                                        }
+                                    }).create().show();
 
-                            //TODO: open prompt to edit the recipe name. auto populate with 'my' + base name in lower case
-                            final Recipe recipe = new Recipe("MY FIRST RECIPE",
-                                    baseName,
-                                    convertListToString(myPrimaryIngredients),
-                                    myAddOns);
-                            Repository.getInstance(getContext()).insertNewRecipe(recipe);
-                            Toast.makeText(getContext(), getResources().getString(R.string.saved, "MY FIRST RECIPE") , Toast.LENGTH_LONG).show();
-                            getActivity().finish();
                         }
 
                     } else {
@@ -330,6 +335,18 @@ public class AddOnFragment extends Fragment {
         outState.putParcelable(KEY_INGREDIENT_ADAPTER, ingredientListView.onSaveInstanceState());
         outState.putParcelable(KEY_ADD_ON_ADAPTER, addOnListView.onSaveInstanceState());
 
+    }
+
+    private void saveRecipe(String recipeName, List<String> myPrimaryIngredients){
+        String myAddOns = null;
+        if (selectedOptional != null){
+            myAddOns = convertListToString(selectedOptional);
+        }
+        Recipe recipe = new Recipe(recipeName,
+                baseName,
+                convertListToString(myPrimaryIngredients),
+                myAddOns);
+        Repository.getInstance(getContext()).insertNewRecipe(recipe);
     }
 
 
