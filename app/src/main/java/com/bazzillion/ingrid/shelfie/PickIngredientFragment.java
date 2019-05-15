@@ -215,10 +215,13 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
         Repository.getInstance(getContext()).getIngredientByName(this, ingredientName);
     }
 
-    public void populateIngredientDetails(Ingredient ingredient){
-        nameTextView.setText(ingredient.name);
-        descriptionTextView.setText(ingredient.description);
-        propertiesTextView.setText(ingredient.properties);
+    public void populateIngredientDetails(String name, String properties, String description){
+        this.name = name;
+        nameTextView.setText(this.name);
+        this.description = description;
+        descriptionTextView.setText(this.description);
+        this.properties = properties;
+        propertiesTextView.setText(this.properties);
     }
 
     @Override

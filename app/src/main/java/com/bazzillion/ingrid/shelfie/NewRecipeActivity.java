@@ -49,7 +49,7 @@ public class NewRecipeActivity extends DrawerActivity implements BaseAdapter.Bas
                     @Override
                     public void onChanged(Recipe recipe) {
                         currentRecipe.removeObserver(this);
-                        String baseName = recipe.getBaseName();
+                        baseName = recipe.getBaseName();
                         fragmentManager.beginTransaction().replace(R.id.add_on_fragment,
                                 AddOnFragment.newInstance(baseName, recipeId))
                                 .commit();
