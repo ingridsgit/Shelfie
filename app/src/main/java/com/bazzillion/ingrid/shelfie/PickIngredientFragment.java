@@ -15,10 +15,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.bazzillion.ingrid.shelfie.Adapters.IngredientPickerAdapter;
+import com.bazzillion.ingrid.shelfie.Database.Base;
 import com.bazzillion.ingrid.shelfie.Database.Repository;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;

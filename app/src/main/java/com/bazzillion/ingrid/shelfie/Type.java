@@ -1,6 +1,7 @@
 package com.bazzillion.ingrid.shelfie;
 
-import java.util.ArrayList;
+import com.bazzillion.ingrid.shelfie.Database.Ingredient;
+
 import java.util.List;
 
 public class Type {

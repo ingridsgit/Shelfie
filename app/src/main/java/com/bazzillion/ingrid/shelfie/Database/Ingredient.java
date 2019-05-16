@@ -1,4 +1,4 @@
-package com.bazzillion.ingrid.shelfie;
+package com.bazzillion.ingrid.shelfie.Database;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;

@@ -5,8 +5,8 @@ import androidx.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.bazzillion.ingrid.shelfie.Base;
-import com.bazzillion.ingrid.shelfie.Ingredient;
+import com.bazzillion.ingrid.shelfie.Database.Base;
+import com.bazzillion.ingrid.shelfie.Database.Ingredient;
 import com.bazzillion.ingrid.shelfie.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class FirebaseDataWriting {
 

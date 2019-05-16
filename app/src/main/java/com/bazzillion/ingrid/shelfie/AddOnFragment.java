@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bazzillion.ingrid.shelfie.Database.AppDatabase;
+import com.bazzillion.ingrid.shelfie.Database.Base;
 import com.bazzillion.ingrid.shelfie.Database.Recipe;
 import com.bazzillion.ingrid.shelfie.Database.Repository;
 import com.google.firebase.database.FirebaseDatabase;

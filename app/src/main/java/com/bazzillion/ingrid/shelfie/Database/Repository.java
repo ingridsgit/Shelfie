@@ -1,7 +1,6 @@
 package com.bazzillion.ingrid.shelfie.Database;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -13,8 +12,6 @@ import androidx.lifecycle.ViewModelProviders;
 import com.bazzillion.ingrid.shelfie.Adapters.BaseAdapter;
 import com.bazzillion.ingrid.shelfie.Adapters.RecipeAdapter;
 import com.bazzillion.ingrid.shelfie.AddOnFragment;
-import com.bazzillion.ingrid.shelfie.Base;
-import com.bazzillion.ingrid.shelfie.Ingredient;
 import com.bazzillion.ingrid.shelfie.PickIngredientFragment;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

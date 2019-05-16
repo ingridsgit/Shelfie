@@ -1,4 +1,4 @@
-package com.bazzillion.ingrid.shelfie;
+package com.bazzillion.ingrid.shelfie.Database;
 
 import android.os.Parcel;
 import android.os.Parcelable;
