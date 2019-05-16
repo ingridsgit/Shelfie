@@ -9,7 +9,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "recipe")
-public class Recipe {
+public class Recipe{
 
     @PrimaryKey(autoGenerate = true)
     private int id;

@@ -98,6 +98,7 @@
     <string name="no_product">No product selected</string>
     <string name="please_select">Please select a base ingredient</string>
     <string name="saved">%s saved</string>
+    <string name="updated">%s updated</string>
     <string name="edit">Edit</string>
     <string name="try_again">Please try again</string>
     <string name="type_recipe_name">Choose a name for your recipe</string>

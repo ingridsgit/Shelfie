@@ -31,9 +31,7 @@ public class Repository {
     private AppDatabase appDatabase;
     private LiveData<List<Recipe>> myRecipes;
     private FirebaseDatabase database;
-    private DatabaseReference basesDbReference;
     private ValueEventListener basesValueEventListener;
-    private DatabaseReference singleBaseDbReference;
     private ValueEventListener singleBaseVEListener;
     private List<String> ingredients;
     private int j;
@@ -87,9 +85,15 @@ public class Repository {
             }
         });
     }
-//
-//    @Update(onConflict = OnConflictStrategy.REPLACE)
-//    void updateRecipe(Recipe recipe); // no need for LiveData
+
+    public void updateRecipe(final Recipe recipe){
+        AppExecutors.getInstance().getDiskIo().execute(new Runnable() {
+            @Override
+            public void run() {
+                appDatabase.recipeDao().updateRecipe(recipe);
+            }
+        });
+    }
 
     public void deleteRecipe(final Recipe recipe){
         AppExecutors.getInstance().getDiskIo().execute(new Runnable() {
@@ -102,8 +106,8 @@ public class Repository {
 
     public void retrieveBases(final BaseAdapter baseAdapter, String productType, final Context context){
         database = FirebaseDatabase.getInstance();
-        basesDbReference = database.getReference().child(FIREBASE_KEY_PRODUCT).child(productType);
-        basesValueEventListener = new ValueEventListener() {
+        DatabaseReference basesDbReference = database.getReference().child(FIREBASE_KEY_PRODUCT).child(productType);
+        basesDbReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ArrayList<String> valueSet = (ArrayList<String>) dataSnapshot.getValue();
@@ -115,23 +119,20 @@ public class Repository {
                 Toast.makeText(context, databaseError.getMessage(), Toast.LENGTH_LONG).show();
             }
 
-        };
-        basesDbReference.addValueEventListener(basesValueEventListener);
+        });
     }
 
-    public void removeBasesValueEventListener(){
-        basesDbReference.removeEventListener(basesValueEventListener);
-    }
 
-    public void retrieveSingleBase(String baseName, final AddOnFragment addOnFragment){
+    public void retrieveSingleBase(final String baseName, final AddOnFragment addOnFragment){
         database = FirebaseDatabase.getInstance();
-        singleBaseDbReference = database.getReference().child(FIREBASE_KEY_BASE).child(baseName);
-        singleBaseVEListener = new ValueEventListener() {
+        DatabaseReference singleBaseDbReference = database.getReference().child(FIREBASE_KEY_BASE).child(baseName);
+        singleBaseDbReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Base selectedBase = dataSnapshot.getValue(Base.class);
                 if (selectedBase != null){
                     addOnFragment.setSelectedBase(selectedBase);
+
                 }
             }
 
@@ -139,13 +140,9 @@ public class Repository {
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(addOnFragment.getContext(), databaseError.getMessage(), Toast.LENGTH_LONG).show();
             }
-        };
-        singleBaseDbReference.addValueEventListener(singleBaseVEListener);
+        });
     }
 
-    public void removeSingleBaseValueEventListener(){
-        singleBaseDbReference.removeEventListener(singleBaseVEListener);
-    }
 
 
 

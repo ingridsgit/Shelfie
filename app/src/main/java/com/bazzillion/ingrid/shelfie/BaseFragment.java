@@ -73,7 +73,6 @@ public class BaseFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        Repository.getInstance(getContext()).removeBasesValueEventListener();
         mListener = null;
     }
 
