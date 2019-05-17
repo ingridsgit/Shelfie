@@ -17,14 +17,14 @@ public interface RecipeDao {
     LiveData<List<Recipe>> loadMyRecipes();
 
     @Query("SELECT * FROM recipe WHERE id = :id")
-    Recipe getRecipeById(int id);
+    LiveData<Recipe> getRecipeById(int id);
 
     @Insert
-    void insertNewRecipe(Recipe recipe);
+    void insertNewRecipe(Recipe recipe); // no need for LiveData
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateRecipe(Recipe recipe);
+    void updateRecipe(Recipe recipe); // no need for LiveData
 
     @Delete
-    void deleteRecipe(Recipe recipe);
+    void deleteRecipe(Recipe recipe); // no need for LiveData
 }

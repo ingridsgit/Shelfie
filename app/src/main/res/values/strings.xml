@@ -3,7 +3,7 @@
     <string name="disclaimer">The recipes are for information purposes only and have no medical value.\n
         Always try to use the ingredients on a small portion of your skin and allow 24 hours to check for allergies.\n
         Make sure you clean your containers and ustensils before making your cosmetics. \n
-        Essential oils are to be diluted and are not suitable for pregnant or breastfeeding women. \n
+        Essential oils are to be diluted and are not suitable for pregnant or breastfeeding women, or for infants. \n
         It may take several tries to find the recipe that best suits your needs. Be patient !</string>
 
     <array name="product_array">
@@ -98,5 +98,9 @@
     <string name="no_product">No product selected</string>
     <string name="please_select">Please select a base ingredient</string>
     <string name="saved">%s saved</string>
+    <string name="updated">%s updated</string>
+    <string name="edit">Edit</string>
+    <string name="try_again">Please try again</string>
+    <string name="type_recipe_name">Choose a name for your recipe</string>
 
 </resources>

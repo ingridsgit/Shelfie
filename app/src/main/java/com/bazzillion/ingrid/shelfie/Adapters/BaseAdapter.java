@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bazzillion.ingrid.shelfie.R;
@@ -19,6 +20,7 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.BaseViewHolder
     private static final String FIREBASE_KEY_BASE = "base";
     private static final String FIREBASE_KEY_DESCRIPTION = "description";
     private BaseClickHandler baseClickHandler;
+    private ProgressBar progressBar;
 
 
     public BaseAdapter(BaseClickHandler baseClickHandler){
@@ -39,6 +41,7 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.BaseViewHolder
     public void onBindViewHolder(@NonNull final BaseViewHolder holder, int position) {
         String baseName = bases.get(position);
         holder.nameView.setText(baseName);
+//        holder.progressBar.setVisibility(View.VISIBLE);
     }
 
 
@@ -66,11 +69,13 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.BaseViewHolder
 
     public class BaseViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView nameView;
+        ProgressBar progressBar;
 
 
         public BaseViewHolder(View itemView) {
             super(itemView);
             nameView = itemView.findViewById(R.id.base_name_text_view);
+//            progressBar = itemView.findViewById(R.id.base_progress_bar);
             itemView.setOnClickListener(this);
         }
 

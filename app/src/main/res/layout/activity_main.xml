@@ -22,13 +22,26 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/disclaimer_text_view"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/layout_margin"
             android:background="@color/colorPrimaryLight"
             android:gravity="center"
             android:padding="@dimen/layout_margin"
-            android:text="@string/disclaimer" />
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/disclaimer"
+                android:gravity="center"
+                android:padding="@dimen/layout_margin"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/bouton_test"/>
+        </androidx.cardview.widget.CardView>
 
         <ListView
             android:layout_width="match_parent"

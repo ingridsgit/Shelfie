@@ -5,13 +5,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
+import com.bazzillion.ingrid.shelfie.Utils.FirebaseDataWriting;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends DrawerActivity {
-    public static final String PRODUCT_TYPE = "product_type";
 
     private ListView productListView;
     private ArrayAdapter<String> productArrayAdapter;
@@ -24,6 +25,14 @@ public class MainActivity extends DrawerActivity {
         setContentView(R.layout.activity_main);
         super.onCreateDrawer();
 
+        Button testButton = findViewById(R.id.bouton_test);
+        testButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseDataWriting.writeToDb(MainActivity.this);
+            }
+        });
+
             productArrayAdapter = new ArrayAdapter<>(this,
                     android.R.layout.simple_list_item_1,
                     getResources().getStringArray(R.array.product_array));
@@ -34,7 +43,7 @@ public class MainActivity extends DrawerActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent intent = new Intent(MainActivity.this, NewRecipeActivity.class);
-                    intent.putExtra(PRODUCT_TYPE, getResources().getStringArray(R.array.product_array)[position]);
+                    intent.putExtra(NewRecipeActivity.KEY_PRODUCT_TYPE, getResources().getStringArray(R.array.product_array)[position]);
                     startActivity(intent);
                 }
             });

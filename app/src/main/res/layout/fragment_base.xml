@@ -12,12 +12,23 @@
         style="@style/sectionStyle"
         android:text="@string/pick_base"/>
 
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:id="@+id/base_recycler_view">
 
     </androidx.recyclerview.widget.RecyclerView>
+
+        <!--<ProgressBar-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/base_progress_bar"/>-->
+
+    </FrameLayout>
 
 
 </LinearLayout>

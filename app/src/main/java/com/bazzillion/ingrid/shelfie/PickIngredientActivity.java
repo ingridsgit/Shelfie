@@ -1,8 +1,10 @@
 package com.bazzillion.ingrid.shelfie;
 
 import androidx.fragment.app.FragmentManager;
-import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
+
+import com.bazzillion.ingrid.shelfie.Database.Base;
 
 public class PickIngredientActivity extends DrawerActivity {
 
