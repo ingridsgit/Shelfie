@@ -269,26 +269,96 @@ dbReference.child("Ingredient").child(String.valueOf(i)).addValueEventListener(n
          }
      }
 
-     public static void addProductInBase(Context context){
+//     public static void addProductInBase(Context context){
+//         FirebaseDatabase database = FirebaseDatabase.getInstance();
+//         DatabaseReference dbReference = database.getReference().child("base");
+//         CSVReader csvReader = new CSVReader(new InputStreamReader(context.getResources().openRawResource(R.raw.base_essai)));
+//         String[] nextLine;
+//         try {
+//             while ((nextLine = csvReader.readNext()) != null) {
+//                 dbReference.child(nextLine[1]).child("product").setValue(nextLine[0]);
+//             }
+//             csvReader.close();
+//         } catch (IOException e){
+//             e.printStackTrace();
+//         }
+//     }
+
+     public static void getProductsFromCSV(Context context){
          FirebaseDatabase database = FirebaseDatabase.getInstance();
-         DatabaseReference dbReference = database.getReference().child("base");
+         DatabaseReference dbReference = database.getReference();
          CSVReader csvReader = new CSVReader(new InputStreamReader(context.getResources().openRawResource(R.raw.base_essai)));
          String[] nextLine;
+         Map<String, String> myProducts = new HashMap<>();
+         List<String> toothpaste = new ArrayList<>();
+         List<String> faceMask = new ArrayList<>();
+         List<String> makeUpRem = new ArrayList<>();
+         List<String> scrub = new ArrayList<>();
+         List<String> bodyCream = new ArrayList<>();
+         List<String> showerGel = new ArrayList<>();
+         List<String> shampoo = new ArrayList<>();
+         List<String> conditioner = new ArrayList<>();
+         List<String> hairMask = new ArrayList<>();
+         int i = 0;
          try {
              while ((nextLine = csvReader.readNext()) != null) {
-                 dbReference.child(nextLine[1]).child("product").setValue(nextLine[0]);
+                 String product = nextLine[0];
+                 String base = nextLine[1];
+                 myProducts.put(product, base);
+                 switch (product){
+                     case "TOOTHPASTE":
+                         toothpaste.add(base);
+                         break;
+                     case "MAKE UP REMOVER":
+                         makeUpRem.add(base);
+                         break;
+                     case "FACE MASK":
+                         faceMask.add(base);
+                         break;
+                     case "SCRUB":
+                         scrub.add(base);
+                         break;
+                     case "BODY CREAM":
+                         bodyCream.add(base);
+                         break;
+                     case "SHOWER GEL":
+                         showerGel.add(base);
+                         break;
+                     case "SHAMPOO":
+                         shampoo.add(base);
+                         break;
+                     case "CONDITIONER":
+                         conditioner.add(base);
+                         break;
+                     case "HAIR MASK":
+                         hairMask.add(base);
+                         break;
+                 }
              }
+
              csvReader.close();
          } catch (IOException e){
              e.printStackTrace();
          }
+         String[] stringArray = context.getResources().getStringArray(R.array.product_array);
+
+         dbReference.child("product").child(stringArray[0]).setValue(toothpaste);
+         dbReference.child("product").child(stringArray[1]).setValue(faceMask);
+         dbReference.child("product").child(stringArray[2]).setValue(makeUpRem);
+         dbReference.child("product").child(stringArray[3]).setValue(scrub);
+         dbReference.child("product").child(stringArray[4]).setValue(bodyCream);
+         dbReference.child("product").child(stringArray[5]).setValue(showerGel);
+         dbReference.child("product").child(stringArray[6]).setValue(shampoo);
+         dbReference.child("product").child(stringArray[7]).setValue(conditioner);
+         dbReference.child("product").child(stringArray[8]).setValue(hairMask);
+
      }
 
 
     public static void writeToDb(Context context){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference dbReference = database.getReference();
-        DatabaseReference childReference = dbReference.child("type");
+//        DatabaseReference childReference = dbReference.child("type");
 //        Map<String, List<String>> typeMap = getTypesFromCsv(context);
 //        Set<Map.Entry<String, List<String>>> entrySet = typeMap.entrySet();
 //        for (Map.Entry<String, List<String>> entry : entrySet ) {
@@ -301,7 +371,7 @@ dbReference.child("Ingredient").child(String.valueOf(i)).addValueEventListener(n
         try {
             while ((nextLine = csvReader.readNext()) != null) {
                 Base base = extractBase(nextLine);
-                dbReference.child("base").child(base.name).setValue(extractBase(nextLine));
+                dbReference.child("base").child(base.name).setValue(base);
                 dbReference.child("base").child(base.name).child("name").removeValue();
                 i++;
             }

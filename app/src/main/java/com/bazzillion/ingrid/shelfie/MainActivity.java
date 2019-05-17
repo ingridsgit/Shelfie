@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
+import com.bazzillion.ingrid.shelfie.Utils.FirebaseDataWriting;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -22,6 +24,14 @@ public class MainActivity extends DrawerActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         super.onCreateDrawer();
+
+        Button testButton = findViewById(R.id.bouton_test);
+        testButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseDataWriting.writeToDb(MainActivity.this);
+            }
+        });
 
             productArrayAdapter = new ArrayAdapter<>(this,
                     android.R.layout.simple_list_item_1,
