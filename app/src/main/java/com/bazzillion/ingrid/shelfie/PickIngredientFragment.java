@@ -137,10 +137,19 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                HashMap<Integer, String> hashMap = (HashMap<Integer, String>) ingredientPickerAdapter.getSelectedIngredients();
                 Intent data = new Intent();
-                data.putExtra(AddOnFragment.KEY_SELECTED_INGREDIENTS, (HashMap<Integer, String>) ingredientPickerAdapter.getSelectedIngredients());
-                getActivity().setResult(RESULT_OK, data);
-                getActivity().finish();
+                data.putExtra(AddOnFragment.KEY_SELECTED_INGREDIENTS, hashMap);
+
+                if (getResources().getBoolean(R.bool.isTablet)){
+                    getTargetFragment().onActivityResult(isOptional, RESULT_OK, data);
+                    getFragmentManager().beginTransaction().detach(PickIngredientFragment.this).commit();
+                } else {
+                    getActivity().setResult(RESULT_OK, data);
+                    getActivity().finish();
+                }
+
+
             }
         });
 
@@ -160,7 +169,7 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
 
 
 
-    public void setMatchinIngredients(List<String> myList, List<String> addOnTypes){
+    public void setMatchingIngredients(List<String> myList, List<String> addOnTypes){
         if (!myList.isEmpty()) {
             ingredientLists.add(myList);
             ingredientTypes.add(addOnTypes.get(i));

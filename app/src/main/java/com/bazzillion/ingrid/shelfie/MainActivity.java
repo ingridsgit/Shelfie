@@ -25,14 +25,6 @@ public class MainActivity extends DrawerActivity {
         setContentView(R.layout.activity_main);
         super.onCreateDrawer();
 
-        Button testButton = findViewById(R.id.bouton_test);
-        testButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FirebaseDataWriting.writeToDb(MainActivity.this);
-            }
-        });
-
             productArrayAdapter = new ArrayAdapter<>(this,
                     android.R.layout.simple_list_item_1,
                     getResources().getStringArray(R.array.product_array));

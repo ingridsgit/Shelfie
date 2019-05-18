@@ -81,4 +81,8 @@ public class Base implements Parcelable {
         dest.writeString(bodyPart);
         dest.writeString(product);
     }
+
+    public void setName(String name){
+        this.name = name;
+    }
 }

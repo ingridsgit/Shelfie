@@ -10,42 +10,52 @@
         android:layout_height="match_parent"
         android:layout_width="match_parent"/>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"/>
+            android:layout_height="?attr/actionBarSize"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:id="@+id/action_bar_space"/>
 
 
         <androidx.cardview.widget.CardView
             android:id="@+id/disclaimer_card_view"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/layout_margin"
             android:background="@color/colorPrimaryLight"
             android:gravity="center"
             android:padding="@dimen/layout_margin"
-            >
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/product_list_view"
+            app:layout_constraintTop_toBottomOf="@id/action_bar_space"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="72dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/disclaimer"
                 android:gravity="center"
-                android:padding="@dimen/layout_margin"/>
+                android:padding="@dimen/layout_margin"
+                android:text="@string/disclaimer" />
 
         </androidx.cardview.widget.CardView>
 
         <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/product_list_view"
-            />
+            android:layout_width="450dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/action_bar_space" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"

@@ -128,6 +128,7 @@ public class Repository {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Base selectedBase = dataSnapshot.getValue(Base.class);
                 if (selectedBase != null){
+                    selectedBase.setName(baseName);
                     addOnFragment.setSelectedBase(selectedBase);
 
                 }
@@ -188,7 +189,7 @@ public class Repository {
                                     myList.add(ingredient);
                                 }
                             }
-                            pickIngredientFragment.setMatchinIngredients(myList, addOnTypes);
+                            pickIngredientFragment.setMatchingIngredients(myList, addOnTypes);
 
                         }
 
