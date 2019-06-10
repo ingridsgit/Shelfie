@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.bazzillion.ingrid.shelfie.Database.Repository;
 import com.bazzillion.ingrid.shelfie.Utils.FirebaseDataWriting;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -16,7 +17,6 @@ public class MainActivity extends DrawerActivity {
 
     private ListView productListView;
     private ArrayAdapter<String> productArrayAdapter;
-    private DatabaseReference databaseReference;
     private static final String LIST_VIEW_STATE = "list_view_state";
 
     @Override
@@ -35,7 +35,7 @@ public class MainActivity extends DrawerActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent intent = new Intent(MainActivity.this, NewRecipeActivity.class);
-                    intent.putExtra(NewRecipeActivity.KEY_PRODUCT_TYPE, getResources().getStringArray(R.array.product_array)[position]);
+                    intent.putExtra(Repository.KEY_PRODUCT_TYPE, getResources().getStringArray(R.array.product_array)[position]);
                     startActivity(intent);
                 }
             });

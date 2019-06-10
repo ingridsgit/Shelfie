@@ -32,15 +32,28 @@ public class Repository {
     private ValueEventListener singleBaseVEListener;
     private List<String> ingredients;
     private int j;
-    private static final String FIREBASE_KEY_INGREDIENT = "Ingredient";
-    private static final String FIREBASE_KEY_PRODUCT = "product";
-    private static final String FIREBASE_KEY_BASE = "base";
-    private static final String FIREBASE_KEY_TYPE = "type";
-    private static final String FIREBASE_KEY_FOR_PRODUCT = "forProduct";
-    private static final String FIREBASE_KEY_SKIN_TYPE = "skinType";
-    private static final String FIREBASE_KEY_NAME = "name";
-    private static final String FIREBASE_KEY_PROPERTIES = "properties";
-    private static final String FIREBASE_KEY_DESCRIPTION = "description";
+    public static final String FIREBASE_KEY_INGREDIENT = "Ingredient";
+    public static final String FIREBASE_KEY_BASE = "base";
+    public static final String FIREBASE_KEY_PRODUCT = "product";
+    public static final String FIREBASE_KEY_TYPE = "type";
+    public static final String FIREBASE_KEY_FOR_PRODUCT = "forProduct";
+    public static final String FIREBASE_KEY_SKIN_TYPE = "skinType";
+    public static final String FIREBASE_KEY_NAME = "name";
+    public static final String FIREBASE_KEY_PROPERTIES = "properties";
+    public static final String FIREBASE_KEY_DESCRIPTION = "description";
+
+    public static final String KEY_COMPULSORY_ADD_ONS = "compulsory_add_ons";
+    public static final String KEY_OPTIONAL_ADD_ONS = "optional_add_ons";
+    public static final String KEY_BASE = "base";
+    public static final String KEY_IS_OPTIONAL = "isOptional";
+    public static final String KEY_SELECTED_INGREDIENTS = "selection";
+    public static final int COMPULSORY_ADD_ON = 123;
+    public static final int OPTIONAL_ADD_ON = 234;
+    public static final int CREATE_RECIPE = 80;
+    public static final int UPDATE_RECIPE = 90;
+    public static final String KEY_ACTIVITY_MODE = "activity_mode";
+    public static final String KEY_RECIPE_ID = "recipe_id";
+    public static final String KEY_PRODUCT_TYPE = "product_type";
 
     public Repository(Context context){
         appDatabase = AppDatabase.getInstance(context);
@@ -140,9 +153,6 @@ public class Repository {
             }
         });
     }
-
-
-
 
     public void getIngredientByName(final PickIngredientFragment pickIngredientFragment, String ingredientName){
         database = FirebaseDatabase.getInstance();

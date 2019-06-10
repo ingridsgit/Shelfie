@@ -18,9 +18,6 @@ import java.util.ArrayList;
 public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.BaseViewHolder> {
 
     private ArrayList<String> bases = new ArrayList<>();
-    private DatabaseReference dbReference;
-    private static final String FIREBASE_KEY_BASE = "base";
-    private static final String FIREBASE_KEY_DESCRIPTION = "description";
     private BaseClickHandler baseClickHandler;
 
 

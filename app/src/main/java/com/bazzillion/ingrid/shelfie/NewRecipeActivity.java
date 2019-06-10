@@ -14,6 +14,12 @@ import com.bazzillion.ingrid.shelfie.Adapters.BaseAdapter;
 import com.bazzillion.ingrid.shelfie.Database.Recipe;
 import com.bazzillion.ingrid.shelfie.Database.Repository;
 
+import static com.bazzillion.ingrid.shelfie.Database.Repository.CREATE_RECIPE;
+import static com.bazzillion.ingrid.shelfie.Database.Repository.KEY_ACTIVITY_MODE;
+import static com.bazzillion.ingrid.shelfie.Database.Repository.KEY_PRODUCT_TYPE;
+import static com.bazzillion.ingrid.shelfie.Database.Repository.KEY_RECIPE_ID;
+import static com.bazzillion.ingrid.shelfie.Database.Repository.UPDATE_RECIPE;
+
 public class NewRecipeActivity extends DrawerActivity implements BaseAdapter.BaseClickHandler {
 
     private String productType = null;
@@ -23,11 +29,7 @@ public class NewRecipeActivity extends DrawerActivity implements BaseAdapter.Bas
     private View baseFragmentView;
     private FragmentManager fragmentManager;
     private LiveData<Recipe> currentRecipe;
-    public static final int CREATE_RECIPE = 80;
-    public static final int UPDATE_RECIPE = 90;
-    public static final String KEY_ACTIVITY_MODE = "activity_mode";
-    public static final String KEY_RECIPE_ID = "recipe_id";
-    public static final String KEY_PRODUCT_TYPE = "product_type";
+
     private static final String KEY_BASE_NAME = "base_name";
 
     @Override

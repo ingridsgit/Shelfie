@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -38,6 +39,7 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
     private static final String KEY_DESCRIPTION = "description";
     private static final String KEY_PROPERTIES = "properties";
     private static final String KEY_SELECTION = "selection";
+    private static final String KEY_PRESELECTED = "preselected";
     private static final String FIREBASE_KEY_INGREDIENT = "Ingredient";
     private static final String FIREBASE_KEY_PRODUCT = "product";
     private static final String FIREBASE_KEY_BASE = "base";
@@ -61,6 +63,7 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
     private ValueEventListener typeEventListener;
     private int i;
     private Button confirmButton;
+    private ArrayList<String> preselectedIngredients = new ArrayList<>();
 
 //    private OnFragmentInteractionListener mListener;
 
@@ -68,11 +71,14 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
         // Required empty public constructor
     }
 
-    public static PickIngredientFragment newInstance(Base selectedBase, int isOptional) {
+    public static PickIngredientFragment newInstance(Base selectedBase, int isOptional, @Nullable List<String> preselectedIngredients) {
         PickIngredientFragment fragment = new PickIngredientFragment();
         Bundle args = new Bundle();
-        args.putParcelable(AddOnFragment.KEY_BASE, selectedBase);
-        args.putInt(AddOnFragment.KEY_IS_OPTIONAL, isOptional);
+        args.putParcelable(Repository.KEY_BASE, selectedBase);
+        args.putInt(Repository.KEY_IS_OPTIONAL, isOptional);
+        if (preselectedIngredients != null){
+            args.putStringArrayList(KEY_PRESELECTED, (ArrayList<String>) preselectedIngredients);
+        }
         fragment.setArguments(args);
         return fragment;
     }
@@ -81,12 +87,15 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null && getArguments() != null) {
-            selectedBase = getArguments().getParcelable(AddOnFragment.KEY_BASE);
-            isOptional = getArguments().getInt(AddOnFragment.KEY_IS_OPTIONAL);
+            selectedBase = getArguments().getParcelable(Repository.KEY_BASE);
+            isOptional = getArguments().getInt(Repository.KEY_IS_OPTIONAL);
+            if (getArguments().containsKey(KEY_PRESELECTED)){
+                preselectedIngredients = getArguments().getStringArrayList(KEY_PRESELECTED);
+            }
 
         } else {
-            selectedBase = savedInstanceState.getParcelable(AddOnFragment.KEY_BASE);
-            isOptional = savedInstanceState.getInt(AddOnFragment.KEY_IS_OPTIONAL);
+            selectedBase = savedInstanceState.getParcelable(Repository.KEY_BASE);
+            isOptional = savedInstanceState.getInt(Repository.KEY_IS_OPTIONAL);
             ingredientLists = (ArrayList<List<String>>) savedInstanceState.getSerializable(KEY_MY_LIST);
             ingredientTypes = savedInstanceState.getStringArrayList(KEY_TYPES);
         }
@@ -112,10 +121,10 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
         if (savedInstanceState == null && selectedBase != null) {
             List<String> addOnTypes;
             switch (isOptional) {
-                case AddOnFragment.COMPULSORY_ADD_ON:
+                case Repository.COMPULSORY_ADD_ON:
                     addOnTypes = selectedBase.compulsoryAddOns;
                     break;
-                case AddOnFragment.OPTIONAL_ADD_ON:
+                case Repository.OPTIONAL_ADD_ON:
                 default:
                     addOnTypes = selectedBase.optionalAddOns;
                     break;
@@ -139,7 +148,7 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
             public void onClick(View v) {
                 HashMap<Integer, String> hashMap = (HashMap<Integer, String>) ingredientPickerAdapter.getSelectedIngredients();
                 Intent data = new Intent();
-                data.putExtra(AddOnFragment.KEY_SELECTED_INGREDIENTS, hashMap);
+                data.putExtra(Repository.KEY_SELECTED_INGREDIENTS, hashMap);
 
                 if (getResources().getBoolean(R.bool.isTablet)){
                     getTargetFragment().onActivityResult(isOptional, RESULT_OK, data);
@@ -234,8 +243,8 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(AddOnFragment.KEY_BASE, selectedBase);
-        outState.putInt(AddOnFragment.KEY_IS_OPTIONAL, isOptional);
+        outState.putParcelable(Repository.KEY_BASE, selectedBase);
+        outState.putInt(Repository.KEY_IS_OPTIONAL, isOptional);
         outState.putStringArrayList(KEY_TYPES, (ArrayList<String>) ingredientTypes);
         outState.putSerializable(KEY_MY_LIST, (ArrayList<List<String>>) ingredientLists);
         if (name != null) {

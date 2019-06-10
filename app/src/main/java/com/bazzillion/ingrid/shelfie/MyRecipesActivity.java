@@ -24,11 +24,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class MyRecipesActivity extends DrawerActivity implements RecipeAdapter.RecipeClickListener {
 
-    private RadioGroup radioGroup;
     private RecyclerView recyclerView;
     private RecipeAdapter recipeAdapter;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,9 +66,9 @@ public class MyRecipesActivity extends DrawerActivity implements RecipeAdapter.R
     @Override
     public void onRecipeClick(int recipeId) {
         Intent intent = new Intent(MyRecipesActivity.this, NewRecipeActivity.class);
-        intent.putExtra(NewRecipeActivity.KEY_ACTIVITY_MODE, NewRecipeActivity.UPDATE_RECIPE);
-        intent.putExtra(NewRecipeActivity.KEY_RECIPE_ID, recipeId);
-        intent.putExtra(NewRecipeActivity.KEY_PRODUCT_TYPE, getResources().getStringArray(R.array.product_array)[0]);
+        intent.putExtra(Repository.KEY_ACTIVITY_MODE, Repository.UPDATE_RECIPE);
+        intent.putExtra(Repository.KEY_RECIPE_ID, recipeId);
+        intent.putExtra(Repository.KEY_PRODUCT_TYPE, getResources().getStringArray(R.array.product_array)[0]);
         startActivity(intent);
 
     }
