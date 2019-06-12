@@ -14,17 +14,17 @@ import com.bazzillion.ingrid.shelfie.Adapters.BaseAdapter;
 import com.bazzillion.ingrid.shelfie.Database.Recipe;
 import com.bazzillion.ingrid.shelfie.Database.Repository;
 
-import static com.bazzillion.ingrid.shelfie.Database.Repository.CREATE_RECIPE;
-import static com.bazzillion.ingrid.shelfie.Database.Repository.KEY_ACTIVITY_MODE;
+import static com.bazzillion.ingrid.shelfie.Database.Repository.INVALID_RECIPE_ID;
+import static com.bazzillion.ingrid.shelfie.Database.Repository.KEY_RECIPE_MODE;
 import static com.bazzillion.ingrid.shelfie.Database.Repository.KEY_PRODUCT_TYPE;
 import static com.bazzillion.ingrid.shelfie.Database.Repository.KEY_RECIPE_ID;
-import static com.bazzillion.ingrid.shelfie.Database.Repository.UPDATE_RECIPE;
+import static com.bazzillion.ingrid.shelfie.Database.Repository.RecipeMode;
 
 public class NewRecipeActivity extends DrawerActivity implements BaseAdapter.BaseClickHandler {
 
     private String productType = null;
     private String baseName = null;
-    private int activityMode;
+    private RecipeMode recipeMode;
     private int recipeId;
     private View baseFragmentView;
     private FragmentManager fragmentManager;
@@ -41,10 +41,10 @@ public class NewRecipeActivity extends DrawerActivity implements BaseAdapter.Bas
         baseFragmentView = findViewById(R.id.base_fragment);
 
         if (savedInstanceState == null){
-            activityMode = getIntent().getIntExtra(KEY_ACTIVITY_MODE, CREATE_RECIPE);
+            recipeMode = (RecipeMode) getIntent().getSerializableExtra(KEY_RECIPE_MODE);
             productType = getIntent().getStringExtra(KEY_PRODUCT_TYPE);
 
-            if (activityMode == UPDATE_RECIPE){
+            if (recipeMode == RecipeMode.Read){
                 recipeId = getIntent().getIntExtra(KEY_RECIPE_ID, 1);
                 final LiveData<Recipe> currentRecipe = Repository.getInstance(this).getRecipeById(this, recipeId);
                 currentRecipe.observe(this, new Observer<Recipe>() {
@@ -53,7 +53,7 @@ public class NewRecipeActivity extends DrawerActivity implements BaseAdapter.Bas
                         currentRecipe.removeObserver(this);
                         baseName = recipe.getBaseName();
                         fragmentManager.beginTransaction().replace(R.id.add_on_fragment,
-                                AddOnFragment.newInstance(baseName, recipeId))
+                                AddOnFragment.newInstance(baseName, recipeId, recipeMode))
                                 .commit();
                         setTitle(baseName);
                     }
@@ -64,9 +64,9 @@ public class NewRecipeActivity extends DrawerActivity implements BaseAdapter.Bas
                         .commit();
             }
         } else {
-            activityMode = savedInstanceState.getInt(KEY_ACTIVITY_MODE);
+            recipeMode = (RecipeMode) savedInstanceState.getSerializable(KEY_RECIPE_MODE);
             productType = savedInstanceState.getString(KEY_PRODUCT_TYPE);
-            if (activityMode == UPDATE_RECIPE){
+            if (recipeMode == RecipeMode.Read){
                 recipeId = savedInstanceState.getInt(KEY_RECIPE_ID, 1);
                 baseName = savedInstanceState.getString(KEY_BASE_NAME);
                 setTitle(baseName);
@@ -74,7 +74,7 @@ public class NewRecipeActivity extends DrawerActivity implements BaseAdapter.Bas
         }
 
 
-        if (activityMode == CREATE_RECIPE){
+        if (recipeMode == RecipeMode.Create){
             baseFragmentView.setVisibility(View.VISIBLE);
             if (productType != null){
                 setTitle(productType);
@@ -90,15 +90,15 @@ public class NewRecipeActivity extends DrawerActivity implements BaseAdapter.Bas
     @Override
     public void onBaseClick(String base) {
         fragmentManager.beginTransaction()
-                .replace(R.id.add_on_fragment, AddOnFragment.newInstance(base))
+                .replace(R.id.add_on_fragment, AddOnFragment.newInstance(base, INVALID_RECIPE_ID, RecipeMode.Create))
                 .commit();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(KEY_ACTIVITY_MODE, activityMode);
-        if (activityMode == UPDATE_RECIPE){
+        outState.putSerializable(KEY_RECIPE_MODE, recipeMode);
+        if (recipeMode == RecipeMode.Read){
             outState.putInt(KEY_RECIPE_ID, recipeId);
             outState.putString(KEY_BASE_NAME, baseName);
         }

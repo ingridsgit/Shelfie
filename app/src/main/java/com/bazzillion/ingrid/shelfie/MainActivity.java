@@ -35,6 +35,7 @@ public class MainActivity extends DrawerActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent intent = new Intent(MainActivity.this, NewRecipeActivity.class);
+                    intent.putExtra(Repository.KEY_RECIPE_MODE, Repository.RecipeMode.Create);
                     intent.putExtra(Repository.KEY_PRODUCT_TYPE, getResources().getStringArray(R.array.product_array)[position]);
                     startActivity(intent);
                 }

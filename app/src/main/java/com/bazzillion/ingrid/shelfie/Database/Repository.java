@@ -32,6 +32,13 @@ public class Repository {
     private ValueEventListener singleBaseVEListener;
     private List<String> ingredients;
     private int j;
+
+    public enum RecipeMode {
+        Create,
+        Read,
+        Rewrite;
+    }
+
     public static final String FIREBASE_KEY_INGREDIENT = "Ingredient";
     public static final String FIREBASE_KEY_BASE = "base";
     public static final String FIREBASE_KEY_PRODUCT = "product";
@@ -49,11 +56,10 @@ public class Repository {
     public static final String KEY_SELECTED_INGREDIENTS = "selection";
     public static final int COMPULSORY_ADD_ON = 123;
     public static final int OPTIONAL_ADD_ON = 234;
-    public static final int CREATE_RECIPE = 80;
-    public static final int UPDATE_RECIPE = 90;
-    public static final String KEY_ACTIVITY_MODE = "activity_mode";
+    public static final String KEY_RECIPE_MODE = "recipe_mode";
     public static final String KEY_RECIPE_ID = "recipe_id";
     public static final String KEY_PRODUCT_TYPE = "product_type";
+    public static final int INVALID_RECIPE_ID = -10;
 
     public Repository(Context context){
         appDatabase = AppDatabase.getInstance(context);

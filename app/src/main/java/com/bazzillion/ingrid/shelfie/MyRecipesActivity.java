@@ -66,7 +66,7 @@ public class MyRecipesActivity extends DrawerActivity implements RecipeAdapter.R
     @Override
     public void onRecipeClick(int recipeId) {
         Intent intent = new Intent(MyRecipesActivity.this, NewRecipeActivity.class);
-        intent.putExtra(Repository.KEY_ACTIVITY_MODE, Repository.UPDATE_RECIPE);
+        intent.putExtra(Repository.KEY_RECIPE_MODE, Repository.RecipeMode.Read);
         intent.putExtra(Repository.KEY_RECIPE_ID, recipeId);
         intent.putExtra(Repository.KEY_PRODUCT_TYPE, getResources().getStringArray(R.array.product_array)[0]);
         startActivity(intent);

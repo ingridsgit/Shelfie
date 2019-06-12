@@ -20,17 +20,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bazzillion.ingrid.shelfie.Database.AppDatabase;
 import com.bazzillion.ingrid.shelfie.Database.Base;
 import com.bazzillion.ingrid.shelfie.Database.Recipe;
 import com.bazzillion.ingrid.shelfie.Database.Repository;
-import com.google.firebase.database.FirebaseDatabase;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,24 +37,25 @@ import static com.bazzillion.ingrid.shelfie.Database.Repository.KEY_BASE;
 import static com.bazzillion.ingrid.shelfie.Database.Repository.KEY_COMPULSORY_ADD_ONS;
 import static com.bazzillion.ingrid.shelfie.Database.Repository.KEY_IS_OPTIONAL;
 import static com.bazzillion.ingrid.shelfie.Database.Repository.KEY_OPTIONAL_ADD_ONS;
+import static com.bazzillion.ingrid.shelfie.Database.Repository.KEY_RECIPE_MODE;
 import static com.bazzillion.ingrid.shelfie.Database.Repository.KEY_SELECTED_INGREDIENTS;
 import static com.bazzillion.ingrid.shelfie.Database.Repository.OPTIONAL_ADD_ON;
+import static com.bazzillion.ingrid.shelfie.Database.Repository.RecipeMode;
+
+
 
 public class AddOnFragment extends Fragment {
+
+
+    private RecipeMode recipeMode;
 
     private static final String KEY_BASE_NAME = "base_name";
     private static final String KEY_SELECTED_COMPULSORY = "selected_compulsory";
     private static final String KEY_SELECTED_OPTIONAL = "selected_optional";
     private static final String KEY_PRIMARY_INGREDIENTS = "primary_ingredients";
-
     private static final String KEY_ADD_ON_ADAPTER = "add_on_adapter";
     private static final String KEY_INGREDIENT_ADAPTER = "ingredient_adapter";
     private static final String SEPARATOR = "-,,,-";
-    private static final String KEY_FRAGMENT_MODE = "key_fragment_mode";
-    private static final int FRAGMENT_MODE_CREATE = 11;
-    private static final int FRAGMENT_MODE_READ = 22;
-    private static final int FRAGMENT_MODE_REWRITE = 33;
-    private int fragmentMode;
     private String baseName;
     private Base selectedBase;
     private TextView descriptionView;
@@ -80,20 +78,11 @@ public class AddOnFragment extends Fragment {
 
     }
 
-    // for Create
-    public static AddOnFragment newInstance(String baseName) {
-        Bundle args = new Bundle();
-        args.putString(KEY_BASE_NAME, baseName);
-        AddOnFragment fragment = new AddOnFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    // for Read and Update
-    public static AddOnFragment newInstance(String baseName, int recipeId) {
+    public static AddOnFragment newInstance(String baseName, int recipeId, RecipeMode recipeMode) {
         Bundle args = new Bundle();
         args.putString(KEY_BASE_NAME, baseName);
         args.putInt(Repository.KEY_RECIPE_ID, recipeId);
+        args.putSerializable(KEY_RECIPE_MODE, recipeMode);
         AddOnFragment fragment = new AddOnFragment();
         fragment.setArguments(args);
         return fragment;
@@ -102,10 +91,9 @@ public class AddOnFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState == null) {
-            if (getArguments() != null) {
-                if (getArguments().containsKey(Repository.KEY_RECIPE_ID)){ // activityMode == Update
-                    fragmentMode = FRAGMENT_MODE_READ;
+        if (savedInstanceState == null && getArguments() != null) {
+            recipeMode = (RecipeMode) getArguments().getSerializable(KEY_RECIPE_MODE);
+                if (recipeMode == RecipeMode.Read){
                     recipeId = getArguments().getInt(Repository.KEY_RECIPE_ID);
                     currentRecipe = Repository.getInstance(getContext()).getRecipeById(getActivity(), recipeId);
                     currentRecipe.observe(this, new Observer<Recipe>() {
@@ -116,10 +104,7 @@ public class AddOnFragment extends Fragment {
                             selectedOptional = convertStringToList(recipe.getAddOns());
                         }
                     });
-                } else { // activityMode == Create
-                    fragmentMode = FRAGMENT_MODE_CREATE;
                 }
-
                 // retrieve the Base from FirebaseDatabase with its name
                 baseName = getArguments().getString(KEY_BASE_NAME);
                 if (baseName != null){
@@ -128,23 +113,19 @@ public class AddOnFragment extends Fragment {
                 } else {
                     Toast.makeText(getContext(), R.string.try_again, Toast.LENGTH_LONG).show();
                 }
-            }
         } else {
-                fragmentMode = savedInstanceState.getInt(KEY_FRAGMENT_MODE);
+                recipeMode = (RecipeMode) savedInstanceState.getSerializable(KEY_RECIPE_MODE);
                 selectedBase = savedInstanceState.getParcelable(KEY_BASE);
                 selectedCompulsory = savedInstanceState.getStringArrayList(KEY_SELECTED_COMPULSORY);
                 selectedOptional = savedInstanceState.getStringArrayList(KEY_SELECTED_OPTIONAL);
                 baseName = savedInstanceState.getString(KEY_BASE_NAME);
                 myPrimaryIngredients = savedInstanceState.getStringArrayList(KEY_PRIMARY_INGREDIENTS);
 //                ingredientListView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_INGREDIENT_ADAPTER));
-            if (fragmentMode == FRAGMENT_MODE_READ || fragmentMode == FRAGMENT_MODE_REWRITE){
+            if (recipeMode == RecipeMode.Read || recipeMode == RecipeMode.Rewrite){
                 recipeId = savedInstanceState.getInt(Repository.KEY_RECIPE_ID);
                 currentRecipe = Repository.getInstance(getContext()).getRecipeById(getActivity(), recipeId);
             }
-
-
         }
-
     }
 
     @Nullable
@@ -170,6 +151,47 @@ public class AddOnFragment extends Fragment {
         shelfLifeTextView = view.findViewById(R.id.shelf_life_text_view);
     }
 
+    private void updateUi(){
+        ingredientArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+        ingredientListView.setAdapter(ingredientArrayAdapter);
+        switch (recipeMode){
+            case Create:
+                setCreateUI();
+                if (selectedBase.primaryIngredients != null){
+                    ingredientArrayAdapter.addAll(selectedBase.primaryIngredients);
+                }
+                if (selectedCompulsory != null){
+                    ingredientArrayAdapter.addAll(selectedCompulsory);
+                }
+                break;
+            case Read:
+                setReadUI();
+                ingredientArrayAdapter.addAll(selectedCompulsory);
+                break;
+            case Rewrite:
+                setRewriteUi();
+                ingredientArrayAdapter.addAll(selectedCompulsory);
+                break;
+        }
+        descriptionView.setText(selectedBase.description);
+        shelfLifeTextView.setText(getString(R.string.shelf_life, selectedBase.shelfLife));
+        pickIngredientButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startPickIngredientFragment(COMPULSORY_ADD_ON);
+            }
+        });
+        addOnAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+        addOnListView.setAdapter(addOnAdapter);
+        addOnAdapter.addAll(selectedOptional);
+        pickAddOnButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startPickIngredientFragment(OPTIONAL_ADD_ON);
+            }
+        });
+    }
+
     private void setRewriteUi(){
         if (selectedBase.compulsoryAddOns == null){
             pickIngredientButton.setVisibility(View.GONE);
@@ -181,27 +203,27 @@ public class AddOnFragment extends Fragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Recipe recipeToBeUpdated = currentRecipe.getValue();
                 editText = new EditText(getContext());
                 DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
                         String recipeName = editText.getText().toString().trim();
-                        recipeToBeUpdated.setName(recipeName);
-                        recipeToBeUpdated.setPrimaryIngredients(convertListToString(myPrimaryIngredients));
+                        currentRecipe.getValue().setName(recipeName);
+                        // TODO: primary ingredients are adding up each time we click on save
+                        currentRecipe.getValue().setPrimaryIngredients(convertListToString(myPrimaryIngredients));
                         String myAddOns = null;
                         if (selectedOptional != null){
                             myAddOns = convertListToString(selectedOptional);
                         }
-                        recipeToBeUpdated.setAddOns(myAddOns);
+                        currentRecipe.getValue().setAddOns(myAddOns);
                         Repository.getInstance(getContext()).updateRecipe(currentRecipe.getValue());
 
                         Toast.makeText(getContext(), getResources().getString(R.string.updated, recipeName) , Toast.LENGTH_LONG).show();
                         getActivity().finish();
                     }
                 };
-              getSelectedIngredients(recipeToBeUpdated.getName(), onClickListener);
+              getSelectedIngredients(currentRecipe.getValue().getName(), onClickListener);
             }
         });
     }
@@ -213,7 +235,7 @@ public class AddOnFragment extends Fragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fragmentMode = FRAGMENT_MODE_REWRITE;
+                recipeMode = RecipeMode.Rewrite;
                 setRewriteUi();
             }
         });
@@ -278,47 +300,6 @@ public class AddOnFragment extends Fragment {
     public void setSelectedBase(Base selectedBase) {
         this.selectedBase = selectedBase;
         updateUi();
-    }
-
-    private void updateUi(){
-        ingredientArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
-        ingredientListView.setAdapter(ingredientArrayAdapter);
-        switch (fragmentMode){
-            case FRAGMENT_MODE_CREATE:
-                setCreateUI();
-                if (selectedBase.primaryIngredients != null){
-                    ingredientArrayAdapter.addAll(selectedBase.primaryIngredients);
-                }
-                if (selectedCompulsory != null){
-                    ingredientArrayAdapter.addAll(selectedCompulsory);
-                }
-                break;
-            case FRAGMENT_MODE_READ:
-                setReadUI();
-                ingredientArrayAdapter.addAll(selectedCompulsory);
-                break;
-            case FRAGMENT_MODE_REWRITE:
-                setRewriteUi();
-                ingredientArrayAdapter.addAll(selectedCompulsory);
-                break;
-        }
-        descriptionView.setText(selectedBase.description);
-        shelfLifeTextView.setText(getString(R.string.shelf_life, selectedBase.shelfLife));
-        pickIngredientButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startPickIngredientFragment(COMPULSORY_ADD_ON);
-            }
-        });
-        addOnAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
-        addOnListView.setAdapter(addOnAdapter);
-        addOnAdapter.addAll(selectedOptional);
-        pickAddOnButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startPickIngredientFragment(OPTIONAL_ADD_ON);
-            }
-        });
     }
 
     private void startPickIngredientFragment(int isOptional){
@@ -404,16 +385,17 @@ public class AddOnFragment extends Fragment {
             if (baseName != null){
                 outState.putString(KEY_BASE_NAME, baseName);
             }
-            outState.putInt(KEY_FRAGMENT_MODE, fragmentMode);
+            outState.putSerializable(KEY_RECIPE_MODE, recipeMode);
             outState.putParcelable(KEY_BASE, selectedBase);
             outState.putStringArrayList(KEY_SELECTED_COMPULSORY, (ArrayList<String>) selectedCompulsory);
             outState.putStringArrayList(KEY_SELECTED_OPTIONAL, (ArrayList<String>) selectedOptional);
             outState.putParcelable(KEY_INGREDIENT_ADAPTER, ingredientListView.onSaveInstanceState());
             outState.putParcelable(KEY_ADD_ON_ADAPTER, addOnListView.onSaveInstanceState());
             outState.putStringArrayList(KEY_PRIMARY_INGREDIENTS, (ArrayList<String>) myPrimaryIngredients);
-        if (fragmentMode == FRAGMENT_MODE_READ || fragmentMode == FRAGMENT_MODE_REWRITE){
+        if (recipeMode == RecipeMode.Read || recipeMode == RecipeMode.Rewrite){
             outState.putInt(Repository.KEY_RECIPE_ID, recipeId);
         }
     }
 
 }
+
