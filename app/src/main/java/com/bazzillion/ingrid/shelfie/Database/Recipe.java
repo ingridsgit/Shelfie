@@ -16,23 +16,27 @@ public class Recipe{
     private String name;
     @ColumnInfo(name = "base_name")
     private String baseName;
+    @ColumnInfo(name = "compulsory_base_ingr")
+    private String compulsoryBaseIngredient;
     @ColumnInfo(name = "primary_ingredients")
     private String primaryIngredients;
     @ColumnInfo(name = "add_ons")
     private String addOns;
 
     @Ignore
-    public Recipe(String name, String baseName, String primaryIngredients, @Nullable String addOns) {
+    public Recipe(String name, String baseName, @Nullable String compulsoryBaseIngredient, @Nullable String primaryIngredients, @Nullable String addOns) {
         this.name = name;
         this.baseName = baseName;
+        this.compulsoryBaseIngredient = compulsoryBaseIngredient;
         this.primaryIngredients = primaryIngredients;
         this.addOns = addOns;
     }
 
-    public Recipe(int id, String name, String baseName, String primaryIngredients, @Nullable String addOns) {
+    public Recipe(int id, String name, String baseName, @Nullable String compulsoryBaseIngredient, @Nullable String primaryIngredients, @Nullable String addOns) {
         this.id = id;
         this.name = name;
         this.baseName = baseName;
+        this.compulsoryBaseIngredient = compulsoryBaseIngredient;
         this.primaryIngredients = primaryIngredients;
         this.addOns = addOns;
     }
@@ -53,8 +57,12 @@ public class Recipe{
         return baseName;
     }
 
-    public void setBaseName(String baseName) {
-        this.baseName = baseName;
+    public String getCompulsoryBaseIngredient() {
+        return compulsoryBaseIngredient;
+    }
+
+    public void setCompulsoryBaseIngredient(String compulsoryBaseIngredient) {
+        this.compulsoryBaseIngredient = compulsoryBaseIngredient;
     }
 
     public String getPrimaryIngredients() {
