@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,9 @@ import android.widget.TextView;
 
 import com.bazzillion.ingrid.shelfie.R;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +29,7 @@ public class IngredientPickerAdapter extends RecyclerView.Adapter<IngredientPick
     private Context context;
     private List<String> ingredientTypes;
     private IngredientClickHandler ingredientClickHandler;
-    private Map<Integer, String> selectedIngredients = new HashMap<>();
+    private List<String> selectedIngredients = new ArrayList<>();
 
     public IngredientPickerAdapter(Context context, List<String> ingredientTypes, IngredientClickHandler ingredientClickHandler){
         this.context = context;
@@ -57,25 +61,40 @@ public class IngredientPickerAdapter extends RecyclerView.Adapter<IngredientPick
                 @Override
                 public void onClick(View v) {
                     ingredientClickHandler.onIngredientClick(ingredient);
-                    selectedIngredients.put(holder.getAdapterPosition(), ingredient);
+                    if (holder.selectedRadioButtonText != null){
+                        selectedIngredients.remove(holder.selectedRadioButtonText);
+                    }
+                    selectedIngredients.add(ingredient);
+                    holder.selectedRadioButtonText = ingredient;
+Log.i("FDGhjjk", selectedIngredients.toString());
                 }
             });
             holder.radioGroup.addView(radioButton);
-            String checkedButton = selectedIngredients.get(holder.getAdapterPosition());
-            if (radioButton.getText().equals(checkedButton)){
+
+            // check the box if the ingredient was selected before starting the fragment
+            if (selectedIngredients.contains(ingredient)){
                 radioButton.setChecked(true);
+                holder.selectedRadioButtonText = ingredient;
             } else {
                 radioButton.setChecked(false);
             }
+//            String checkedButton = selectedIngredients.get(holder.getAdapterPosition());
+//            if (radioButton.getText().equals(checkedButton)){
+//                radioButton.setChecked(true);
+//            }
         }
         holder.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 holder.radioGroup.clearCheck();
-                selectedIngredients.remove(String.valueOf(holder.getAdapterPosition()));
+                if (holder.selectedRadioButtonText != null){
+                    selectedIngredients.remove(holder.selectedRadioButtonText);
+                    holder.selectedRadioButtonText = null;
+                }
+
+
             }
         });
-
 
 
     }
@@ -94,11 +113,11 @@ public class IngredientPickerAdapter extends RecyclerView.Adapter<IngredientPick
         notifyDataSetChanged();
     }
 
-    public Map<Integer, String> getSelectedIngredients(){
+    public List<String> getSelectedIngredients(){
         return selectedIngredients;
     }
 
-    public void setSelectedIngredients(Map<Integer, String> selectedIngredients){
+    public void setSelectedIngredients(List<String> selectedIngredients){
         this.selectedIngredients = selectedIngredients;
     }
 
@@ -106,11 +125,14 @@ public class IngredientPickerAdapter extends RecyclerView.Adapter<IngredientPick
         void onIngredientClick(String ingredient);
     }
 
+
+
     public class PickerViewHolder extends RecyclerView.ViewHolder {
 
         private final RadioGroup radioGroup;
         private final TextView textView;
         private final Button button;
+        String selectedRadioButtonText = null;
 
         PickerViewHolder(View itemView) {
             super(itemView);

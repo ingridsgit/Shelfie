@@ -132,7 +132,7 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
             i = 0;
             Repository.getInstance(getContext()).getMatchingIngredients(i, addOnTypes, this, selectedBase.product, hairType);
         } else {
-            ingredientPickerAdapter.setSelectedIngredients((Map<Integer, String>)savedInstanceState.getSerializable(KEY_SELECTION));
+            ingredientPickerAdapter.setSelectedIngredients((List<String>)savedInstanceState.getSerializable(KEY_SELECTION));
             name = savedInstanceState.getString(KEY_NAME);
             description = savedInstanceState.getString(KEY_DESCRIPTION);
             properties = savedInstanceState.getString(KEY_PROPERTIES);
@@ -146,19 +146,17 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HashMap<Integer, String> hashMap = (HashMap<Integer, String>) ingredientPickerAdapter.getSelectedIngredients();
-                Intent data = new Intent();
-                data.putExtra(Repository.KEY_SELECTED_INGREDIENTS, hashMap);
+                ArrayList<String> selectedIngredients = (ArrayList<String>) ingredientPickerAdapter.getSelectedIngredients();
+                Intent intent = new Intent();
+                intent.putExtra(Repository.KEY_SELECTED_INGREDIENTS, selectedIngredients);
 
                 if (getResources().getBoolean(R.bool.isTablet)){
-                    getTargetFragment().onActivityResult(isOptional, RESULT_OK, data);
+                    getTargetFragment().onActivityResult(isOptional, RESULT_OK, intent);
                     getFragmentManager().beginTransaction().detach(PickIngredientFragment.this).commit();
                 } else {
-                    getActivity().setResult(RESULT_OK, data);
+                    getActivity().setResult(RESULT_OK, intent);
                     getActivity().finish();
                 }
-
-
             }
         });
 
@@ -169,6 +167,7 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
     private void updateRecyclerView() {
         ingredientPickerAdapter = new IngredientPickerAdapter(getContext(), ingredientTypes, this);
         ingredientPickerAdapter.setIngredientLists(ingredientLists);
+        ingredientPickerAdapter.setSelectedIngredients(preselectedIngredients);
         linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setSaveEnabled(true);
@@ -256,7 +255,7 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
         if (properties != null) {
             outState.putString(KEY_PROPERTIES, properties);
         }
-        outState.putSerializable(KEY_SELECTION, (HashMap<Integer, String>) ingredientPickerAdapter.getSelectedIngredients());
+        outState.putSerializable(KEY_SELECTION, (ArrayList<String>) ingredientPickerAdapter.getSelectedIngredients());
 
 
     }

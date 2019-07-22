@@ -33,7 +33,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/sectionStyle"
-        android:text="@string/add_ons"/>
+        android:text="@string/add_ons"
+        android:id="@+id/add_on_text_view"/>
 
     <ListView
         android:layout_width="match_parent"
