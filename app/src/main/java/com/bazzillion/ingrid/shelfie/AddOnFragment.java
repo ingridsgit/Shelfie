@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 
-import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +28,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
@@ -102,8 +100,8 @@ public class AddOnFragment extends Fragment {
                         @Override
                         public void onChanged(Recipe recipe) {
                             currentRecipe.removeObserver(this);
-                            selectedCompulsory = convertStringToList(recipe.getPrimaryIngredients());
-                            selectedOptional = convertStringToList(recipe.getAddOns());
+                            selectedCompulsory = convertStringToList(recipe.getCompulsoryAddOns());
+                            selectedOptional = convertStringToList(recipe.getOptionalAddOns());
                         }
                     });
                 }
@@ -313,6 +311,7 @@ public class AddOnFragment extends Fragment {
         if (resultCode == RESULT_OK){
             ArrayList<String> selectedIngredients = (ArrayList<String>) data.getSerializableExtra(KEY_SELECTED_INGREDIENTS);
             if (requestCode == COMPULSORY_ADD_ON){
+                Toast.makeText(getContext(), "I AM CALLED", Toast.LENGTH_LONG).show();
                 selectedCompulsory.clear();
                 selectedCompulsory.addAll(selectedIngredients);
                 ingredientArrayAdapter.clear();
@@ -355,9 +354,9 @@ public class AddOnFragment extends Fragment {
             Toast.makeText(getContext(), getResources().getString(R.string.please_select), Toast.LENGTH_LONG).show();
         } else {
             currentRecipe.getValue().setName(newRecipeName);
-            currentRecipe.getValue().setCompulsoryBaseIngredient(selectedCompulsoryString);
-            currentRecipe.getValue().setPrimaryIngredients(primaryIngredientsString);
-            currentRecipe.getValue().setAddOns(selectedOptionalString);
+            currentRecipe.getValue().setCompulsoryBaseIngredient(primaryIngredientsString);
+            currentRecipe.getValue().setCompulsoryAddOns(selectedCompulsoryString);
+            currentRecipe.getValue().setOptionalAddOns(selectedOptionalString);
             Repository.getInstance(getContext()).updateRecipe(currentRecipe.getValue());
             Toast.makeText(getContext(), getResources().getString(R.string.updated, newRecipeName), Toast.LENGTH_LONG).show();
             getActivity().finish();

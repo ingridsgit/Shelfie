@@ -1,7 +1,5 @@
 package com.bazzillion.ingrid.shelfie.Database;
 
-import java.util.List;
-
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -19,26 +17,26 @@ public class Recipe{
     @ColumnInfo(name = "compulsory_base_ingr")
     private String compulsoryBaseIngredient;
     @ColumnInfo(name = "primary_ingredients")
-    private String primaryIngredients;
+    private String compulsoryAddOns;
     @ColumnInfo(name = "add_ons")
-    private String addOns;
+    private String optionalAddOns;
 
     @Ignore
-    public Recipe(String name, String baseName, @Nullable String compulsoryBaseIngredient, @Nullable String primaryIngredients, @Nullable String addOns) {
+    public Recipe(String name, String baseName, @Nullable String compulsoryBaseIngredient, @Nullable String compulsoryAddOns, @Nullable String optionalAddOns) {
         this.name = name;
         this.baseName = baseName;
         this.compulsoryBaseIngredient = compulsoryBaseIngredient;
-        this.primaryIngredients = primaryIngredients;
-        this.addOns = addOns;
+        this.compulsoryAddOns = compulsoryAddOns;
+        this.optionalAddOns = optionalAddOns;
     }
 
-    public Recipe(int id, String name, String baseName, @Nullable String compulsoryBaseIngredient, @Nullable String primaryIngredients, @Nullable String addOns) {
+    public Recipe(int id, String name, String baseName, @Nullable String compulsoryBaseIngredient, @Nullable String compulsoryAddOns, @Nullable String optionalAddOns) {
         this.id = id;
         this.name = name;
         this.baseName = baseName;
         this.compulsoryBaseIngredient = compulsoryBaseIngredient;
-        this.primaryIngredients = primaryIngredients;
-        this.addOns = addOns;
+        this.compulsoryAddOns = compulsoryAddOns;
+        this.optionalAddOns = optionalAddOns;
     }
 
     public int getId() {
@@ -65,20 +63,20 @@ public class Recipe{
         this.compulsoryBaseIngredient = compulsoryBaseIngredient;
     }
 
-    public String getPrimaryIngredients() {
-        return primaryIngredients;
+    public String getCompulsoryAddOns() {
+        return compulsoryAddOns;
     }
 
-    public void setPrimaryIngredients(String primaryIngredients) {
-        this.primaryIngredients = primaryIngredients;
+    public void setCompulsoryAddOns(String compulsoryAddOns) {
+        this.compulsoryAddOns = compulsoryAddOns;
     }
 
-    public String getAddOns() {
-        return addOns;
+    public String getOptionalAddOns() {
+        return optionalAddOns;
     }
 
-    public void setAddOns(String addOns) {
-        this.addOns = addOns;
+    public void setOptionalAddOns(String optionalAddOns) {
+        this.optionalAddOns = optionalAddOns;
     }
 
 }
