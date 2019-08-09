@@ -21,6 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Repository {
 
@@ -48,6 +49,7 @@ public class Repository {
     public static final String FIREBASE_KEY_NAME = "name";
     public static final String FIREBASE_KEY_PROPERTIES = "properties";
     public static final String FIREBASE_KEY_DESCRIPTION = "description";
+    public static final String FIREBASE_KEY_SPECIFICITY = "specificity";
 
     public static final String KEY_COMPULSORY_ADD_ONS = "compulsory_add_ons";
     public static final String KEY_OPTIONAL_ADD_ONS = "optional_add_ons";
@@ -169,7 +171,8 @@ public class Repository {
                 String name = dataSnapshot.child(FIREBASE_KEY_NAME).getValue().toString();
                 String properties = dataSnapshot.child(FIREBASE_KEY_PROPERTIES).getValue().toString();
                 String description = dataSnapshot.child(FIREBASE_KEY_DESCRIPTION).getValue().toString();
-                pickIngredientFragment.populateIngredientDetails(name, properties, description);
+                Map<String, Boolean> specificities = (Map<String, Boolean>) dataSnapshot.child(FIREBASE_KEY_SPECIFICITY).getValue();
+                pickIngredientFragment.populateIngredientDetails(name, properties, description, specificities);
             }
 
             @Override

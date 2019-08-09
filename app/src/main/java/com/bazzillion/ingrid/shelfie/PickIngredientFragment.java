@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +23,9 @@ import com.bazzillion.ingrid.shelfie.Database.Repository;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -40,18 +42,16 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
     private static final String KEY_PROPERTIES = "properties";
     private static final String KEY_SELECTION = "selection";
     private static final String KEY_PRESELECTED = "preselected";
-    private static final String FIREBASE_KEY_INGREDIENT = "Ingredient";
-    private static final String FIREBASE_KEY_PRODUCT = "product";
-    private static final String FIREBASE_KEY_BASE = "base";
-    private static final String FIREBASE_KEY_TYPE = "type";
-    private static final String FIREBASE_KEY_FOR_PRODUCT = "forProduct";
-    private static final String FIREBASE_KEY_SKIN_TYPE = "skinType";
+    private static final String KEY_MATCHING_SPECS = "matching_specs";
     private Base selectedBase;
     private int isOptional;
     private TextView nameTextView;
     private TextView descriptionTextView;
     private TextView propertiesTextView;
-    private String hairType;
+    private TextView matchingSpecTextView;
+    private String matchingSpecs;
+    private String hairOrSkinType;
+    private String[] userSpecificities;
     private String name;
     private String description;
     private String properties;
@@ -100,9 +100,8 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
             ingredientTypes = savedInstanceState.getStringArrayList(KEY_TYPES);
         }
 
-        hairType = getPreferenceByBodyPart(selectedBase.bodyPart);
-
-
+        hairOrSkinType = getPreferenceByBodyPart(selectedBase.bodyPart);
+        userSpecificities = getSpecificitiesByBodyPart(selectedBase.bodyPart);
     }
 
     @Override
@@ -115,6 +114,7 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
         propertiesTextView = view.findViewById(R.id.properties_tv);
         nameTextView = view.findViewById(R.id.ingredient_name_tv);
         confirmButton = view.findViewById(R.id.confirm_button);
+        matchingSpecTextView = view.findViewById(R.id.matching_specs_tv);
 
 
         updateRecyclerView();
@@ -130,16 +130,20 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
                     break;
             }
             i = 0;
-            Repository.getInstance(getContext()).getMatchingIngredients(i, addOnTypes, this, selectedBase.product, hairType);
+            Repository.getInstance(getContext()).getMatchingIngredients(i, addOnTypes, this, selectedBase.product, hairOrSkinType);
         } else {
             ingredientPickerAdapter.setSelectedIngredients((List<String>)savedInstanceState.getSerializable(KEY_SELECTION));
             name = savedInstanceState.getString(KEY_NAME);
             description = savedInstanceState.getString(KEY_DESCRIPTION);
             properties = savedInstanceState.getString(KEY_PROPERTIES);
+            matchingSpecs = savedInstanceState.getString(KEY_MATCHING_SPECS);
             if (name != null && description != null && properties != null) {
                 nameTextView.setText(name);
                 propertiesTextView.setText(properties);
                 descriptionTextView.setText(description);
+            }
+            if (matchingSpecs != null){
+                matchingSpecTextView.setText(matchingSpecs);
             }
 
         }
@@ -185,7 +189,7 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
         }
         i++;
         if (i < addOnTypes.size()) {
-            Repository.getInstance(getContext()).getMatchingIngredients(i, addOnTypes, this, selectedBase.product, hairType);
+            Repository.getInstance(getContext()).getMatchingIngredients(i, addOnTypes, this, selectedBase.product, hairOrSkinType);
         } else {
             ingredientPickerAdapter.setIngredientLists(ingredientLists);
         }
@@ -202,6 +206,21 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
             case HAIR:
             default:
                 return sharedPreferences.getString(getContext().getResources().getString(R.string.key_hair_type), "REGULAR HAIR");
+        }
+    }
+
+    private String[] getSpecificitiesByBodyPart(String bodyPart) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        switch (bodyPart) {
+            case MOUTH:
+                return null;
+            case SKIN:
+                Set<String> skinSet = sharedPreferences.getStringSet(getContext().getResources().getString(R.string.key_skin_specificity), null);
+                return skinSet.toArray(new String[0]);
+            case HAIR:
+            default:
+                boolean dandruff = sharedPreferences.getBoolean(getContext().getResources().getString(R.string.key_dandruff), false);
+                return dandruff ? new String[]{"Dandruff"} : null;
         }
     }
 
@@ -227,16 +246,31 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
 
     @Override
     public void onIngredientClick(String ingredientName) {
+        // this method calls @populateIngredientDetails below
         Repository.getInstance(getContext()).getIngredientByName(this, ingredientName);
     }
 
-    public void populateIngredientDetails(String name, String properties, String description){
+    public void populateIngredientDetails(String name, String properties, String description, Map<String, Boolean> specificities){
         this.name = name;
         nameTextView.setText(this.name);
         this.description = description;
         descriptionTextView.setText(this.description);
         this.properties = properties;
         propertiesTextView.setText(this.properties);
+        StringBuilder matchingSpecBuilder = new StringBuilder();
+        for (String specificity : userSpecificities){
+            if (specificities.containsKey(specificity)){
+                String comma = matchingSpecBuilder.length() == 0 ? "Good for " : ", ";
+                matchingSpecBuilder.append(comma).append(specificity);
+            }
+        }
+        matchingSpecs = matchingSpecBuilder.toString();
+        if (matchingSpecs != null){
+            matchingSpecTextView.setVisibility(View.VISIBLE);
+            matchingSpecTextView.setText(matchingSpecs);
+        } else {
+            matchingSpecTextView.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -254,6 +288,9 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
         }
         if (properties != null) {
             outState.putString(KEY_PROPERTIES, properties);
+        }
+        if (matchingSpecs != null){
+            outState.putString(KEY_MATCHING_SPECS, matchingSpecs);
         }
         outState.putSerializable(KEY_SELECTION, (ArrayList<String>) ingredientPickerAdapter.getSelectedIngredients());
 

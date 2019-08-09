@@ -9,9 +9,6 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.bazzillion.ingrid.shelfie.Database.Repository;
-import com.bazzillion.ingrid.shelfie.Utils.FirebaseDataWriting;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends DrawerActivity {
 

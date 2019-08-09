@@ -66,7 +66,6 @@ public class IngredientPickerAdapter extends RecyclerView.Adapter<IngredientPick
                     }
                     selectedIngredients.add(ingredient);
                     holder.selectedRadioButtonText = ingredient;
-Log.i("FDGhjjk", selectedIngredients.toString());
                 }
             });
             holder.radioGroup.addView(radioButton);
