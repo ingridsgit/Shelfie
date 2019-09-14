@@ -15,11 +15,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bazzillion.ingrid.shelfie.Adapters.IngredientPickerAdapter;
 import com.bazzillion.ingrid.shelfie.Database.Base;
 import com.bazzillion.ingrid.shelfie.Database.Repository;
+import com.bazzillion.ingrid.shelfie.Utils.CrossAppFunctions;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -64,6 +66,7 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
     private int i;
     private Button confirmButton;
     private ArrayList<String> preselectedIngredients = new ArrayList<>();
+    private ProgressBar progressBar;
 
 //    private OnFragmentInteractionListener mListener;
 
@@ -86,6 +89,7 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        CrossAppFunctions.checkNetworkState(getContext());
         if (savedInstanceState == null && getArguments() != null) {
             selectedBase = getArguments().getParcelable(Repository.KEY_BASE);
             isOptional = getArguments().getInt(Repository.KEY_IS_OPTIONAL);
@@ -108,7 +112,8 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_pick_ingredient, container, false);
-
+        progressBar = view.findViewById(R.id.progress_bar);
+        progressBar.setVisibility(View.VISIBLE);
         recyclerView = view.findViewById(R.id.picker_recycler_view);
         descriptionTextView = view.findViewById(R.id.ingredient_description_tv);
         propertiesTextView = view.findViewById(R.id.properties_tv);
@@ -163,8 +168,6 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
                 }
             }
         });
-
-
         return view;
     }
 
@@ -185,6 +188,7 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
         if (!myList.isEmpty()) {
             ingredientLists.add(myList);
             ingredientTypes.add(addOnTypes.get(i));
+            progressBar.setVisibility(View.GONE);
 
         }
         i++;
@@ -250,7 +254,7 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
         Repository.getInstance(getContext()).getIngredientByName(this, ingredientName);
     }
 
-    public void populateIngredientDetails(String name, String properties, String description, Map<String, Boolean> specificities){
+    public void populateIngredientDetails(String name, String properties, String description, @Nullable Map<String, Boolean> specificities){
         this.name = name;
         nameTextView.setText(this.name);
         this.description = description;
@@ -258,10 +262,14 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
         this.properties = properties;
         propertiesTextView.setText(this.properties);
         StringBuilder matchingSpecBuilder = new StringBuilder();
-        for (String specificity : userSpecificities){
-            if (specificities.containsKey(specificity)){
-                String comma = matchingSpecBuilder.length() == 0 ? "Good for " : ", ";
-                matchingSpecBuilder.append(comma).append(specificity);
+        if (userSpecificities != null) {
+            for (String specificity : userSpecificities) {
+                if (specificities != null && specificities.containsKey(specificity)) {
+                    String comma = matchingSpecBuilder.length() == 0 ? "Good for " : ", ";
+                    matchingSpecBuilder.append(comma).append(specificity);
+                    //TODO: when basefragment restarts after bug, PICK button is visible even though it shouldnt
+                    // + remove excels sheets from github
+                }
             }
         }
         matchingSpecs = matchingSpecBuilder.toString();

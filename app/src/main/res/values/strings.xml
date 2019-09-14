@@ -102,5 +102,6 @@
     <string name="edit">Edit</string>
     <string name="try_again">Please try again</string>
     <string name="type_recipe_name">Choose a name for your recipe</string>
+    <string name="no_internet">Please check your internet connection</string>
 
 </resources>

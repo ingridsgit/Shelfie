@@ -19,13 +19,25 @@
             <!--android:gravity="center"-->
             <!--android:text="@string/empty_view" />-->
 
-        <androidx.recyclerview.widget.RecyclerView
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:id="@+id/progress_bar"/>
+
+    <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2"
+            android:layout_height="match_parent"
             android:id="@+id/picker_recycler_view">
 
         </androidx.recyclerview.widget.RecyclerView>
+
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

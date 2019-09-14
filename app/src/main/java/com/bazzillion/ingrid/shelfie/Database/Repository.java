@@ -1,6 +1,7 @@
 package com.bazzillion.ingrid.shelfie.Database;
 
 import android.content.Context;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import androidx.lifecycle.ViewModelProviders;
 import com.bazzillion.ingrid.shelfie.Adapters.BaseAdapter;
 import com.bazzillion.ingrid.shelfie.Adapters.RecipeAdapter;
 import com.bazzillion.ingrid.shelfie.AddOnFragment;
+import com.bazzillion.ingrid.shelfie.BaseFragment;
 import com.bazzillion.ingrid.shelfie.PickIngredientFragment;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -122,7 +124,7 @@ public class Repository {
         });
     }
 
-    public void retrieveBases(final BaseAdapter baseAdapter, String productType, final Context context){
+    public void retrieveBases(final BaseAdapter baseAdapter, String productType, final BaseFragment fragment){
         database = FirebaseDatabase.getInstance();
         DatabaseReference basesDbReference = database.getReference().child(FIREBASE_KEY_PRODUCT).child(productType);
         basesDbReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -130,11 +132,12 @@ public class Repository {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ArrayList<String> valueSet = (ArrayList<String>) dataSnapshot.getValue();
                 baseAdapter.setBases(valueSet);
+                fragment.progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(context, databaseError.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(fragment.getContext(), databaseError.getMessage(), Toast.LENGTH_LONG).show();
             }
 
         });

@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 
 import com.bazzillion.ingrid.shelfie.Adapters.BaseAdapter;
 import com.bazzillion.ingrid.shelfie.Database.Repository;
+import com.bazzillion.ingrid.shelfie.Utils.CrossAppFunctions;
 
 public class BaseFragment extends Fragment {
 
@@ -20,6 +21,7 @@ public class BaseFragment extends Fragment {
     private String productType;
     private RecyclerView recyclerView;
     private BaseAdapter baseAdapter;
+    public ProgressBar progressBar;
 
     public BaseFragment() {
         // Required empty public constructor
@@ -43,7 +45,8 @@ public class BaseFragment extends Fragment {
 
         if (productType != null){
             baseAdapter = new BaseAdapter((BaseAdapter.BaseClickHandler) getActivity());
-            Repository.getInstance(getContext()).retrieveBases(baseAdapter, productType, getContext());
+            CrossAppFunctions.checkNetworkState(getContext());
+            Repository.getInstance(getContext()).retrieveBases(baseAdapter, productType, this);
         }
 
     }
@@ -54,6 +57,8 @@ public class BaseFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_base, container, false);
+        progressBar = view.findViewById(R.id.base_progress_bar);
+        progressBar.setVisibility(View.VISIBLE);
         recyclerView = view.findViewById(R.id.base_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         recyclerView.setAdapter(baseAdapter);

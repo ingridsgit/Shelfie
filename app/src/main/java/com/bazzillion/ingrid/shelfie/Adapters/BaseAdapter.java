@@ -41,7 +41,6 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.BaseViewHolder
     public void onBindViewHolder(@NonNull final BaseViewHolder holder, int position) {
         String baseName = bases.get(position);
         holder.nameView.setText(baseName);
-//        holder.progressBar.setVisibility(View.VISIBLE);
     }
 
 
@@ -69,13 +68,11 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.BaseViewHolder
 
     public class BaseViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView nameView;
-        ProgressBar progressBar;
 
 
         public BaseViewHolder(View itemView) {
             super(itemView);
             nameView = itemView.findViewById(R.id.base_name_text_view);
-//            progressBar = itemView.findViewById(R.id.base_progress_bar);
             itemView.setOnClickListener(this);
         }
 

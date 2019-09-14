@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.bazzillion.ingrid.shelfie.Adapters.BaseAdapter;
 import com.bazzillion.ingrid.shelfie.Database.Recipe;
 import com.bazzillion.ingrid.shelfie.Database.Repository;
+import com.bazzillion.ingrid.shelfie.Utils.CrossAppFunctions;
 
 import static com.bazzillion.ingrid.shelfie.Database.Repository.INVALID_RECIPE_ID;
 import static com.bazzillion.ingrid.shelfie.Database.Repository.KEY_RECIPE_MODE;
@@ -89,9 +90,12 @@ public class NewRecipeActivity extends DrawerActivity implements BaseAdapter.Bas
 
     @Override
     public void onBaseClick(String base) {
-        fragmentManager.beginTransaction()
-                .replace(R.id.add_on_fragment, AddOnFragment.newInstance(base, INVALID_RECIPE_ID, RecipeMode.Create))
-                .commit();
+        if (CrossAppFunctions.checkNetworkState(this) == 1) {
+            fragmentManager.beginTransaction()
+                    .replace(R.id.add_on_fragment, AddOnFragment.newInstance(base, INVALID_RECIPE_ID, RecipeMode.Create))
+                    .commit();
+        }
+
     }
 
     @Override

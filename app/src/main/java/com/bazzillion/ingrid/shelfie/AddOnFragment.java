@@ -16,13 +16,16 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bazzillion.ingrid.shelfie.Database.Base;
 import com.bazzillion.ingrid.shelfie.Database.Recipe;
 import com.bazzillion.ingrid.shelfie.Database.Repository;
+import com.bazzillion.ingrid.shelfie.Utils.CrossAppFunctions;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -149,12 +152,12 @@ public class AddOnFragment extends Fragment {
         saveButton = view.findViewById(R.id.save_button);
         shelfLifeTextView = view.findViewById(R.id.shelf_life_text_view);
         addOnTextView = view.findViewById(R.id.add_on_text_view);
+
     }
 
     private void updateUi(){
         ingredientArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
         ingredientListView.setAdapter(ingredientArrayAdapter);
-        // TODO verifier tout ca
         switch (recipeMode){
             case Create:
                 setCreateUI();
@@ -311,7 +314,6 @@ public class AddOnFragment extends Fragment {
         if (resultCode == RESULT_OK){
             ArrayList<String> selectedIngredients = (ArrayList<String>) data.getSerializableExtra(KEY_SELECTED_INGREDIENTS);
             if (requestCode == COMPULSORY_ADD_ON){
-                Toast.makeText(getContext(), "I AM CALLED", Toast.LENGTH_LONG).show();
                 selectedCompulsory.clear();
                 selectedCompulsory.addAll(selectedIngredients);
                 ingredientArrayAdapter.clear();
