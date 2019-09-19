@@ -9,6 +9,9 @@
     <dimen name="fab_margin">16dp</dimen>
 
     <dimen name="base_height">176dp</dimen>
-    <dimen name="base_widhth">96dp</dimen>
+    <dimen name="base_width">96dp</dimen>
     <dimen name="base_name_tv_height">64dp</dimen>
+
+    <dimen name="card_corner_radius">8dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
 </resources>
