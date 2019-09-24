@@ -9,6 +9,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,16 +18,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.ProgressBar;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bazzillion.ingrid.shelfie.Adapters.MySimpleAdapter;
 import com.bazzillion.ingrid.shelfie.Database.Base;
 import com.bazzillion.ingrid.shelfie.Database.Recipe;
 import com.bazzillion.ingrid.shelfie.Database.Repository;
-import com.bazzillion.ingrid.shelfie.Utils.CrossAppFunctions;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -60,10 +60,10 @@ public class AddOnFragment extends Fragment {
     private static final String SEPARATOR = "-,,,-";
 
     private TextView descriptionView;
-    private ArrayAdapter<String> ingredientArrayAdapter;
-    private ArrayAdapter<String> addOnAdapter;
-    private ListView ingredientListView;
-    private ListView addOnListView;
+    private MySimpleAdapter ingredientAdapter;
+    private MySimpleAdapter addOnAdapter;
+    private RecyclerView ingredientRecyclerView;
+    private RecyclerView addOnRecyclerView;
     private Button pickIngredientButton;
     private Button pickAddOnButton;
     private Button saveButton;
@@ -122,7 +122,7 @@ public class AddOnFragment extends Fragment {
                 selectedCompulsory = savedInstanceState.getStringArrayList(KEY_SELECTED_COMPULSORY);
                 selectedOptional = savedInstanceState.getStringArrayList(KEY_SELECTED_OPTIONAL);
                 baseName = savedInstanceState.getString(KEY_BASE_NAME);
-//                ingredientListView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_INGREDIENT_ADAPTER));
+//                ingredientRecyclerView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_INGREDIENT_ADAPTER));
             if (recipeMode == RecipeMode.Read || recipeMode == RecipeMode.Rewrite){
                 recipeId = savedInstanceState.getInt(Repository.KEY_RECIPE_ID);
                 currentRecipe = Repository.getInstance(getContext()).getRecipeById(getActivity(), recipeId);
@@ -136,8 +136,8 @@ public class AddOnFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_add_on, container, false);
         bindViews(view);
         if (savedInstanceState != null && selectedBase != null){
-            ingredientListView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_INGREDIENT_ADAPTER));
-            addOnListView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_ADD_ON_ADAPTER));
+//            ingredientRecyclerView.getLayoutManager().onRestoreInstanceState(savedInstanceState.getParcelable(KEY_INGREDIENT_ADAPTER));
+//            addOnRecyclerView.getLayoutManager().onRestoreInstanceState(savedInstanceState.getParcelable(KEY_ADD_ON_ADAPTER));
             updateUi();
         }
         return view;
@@ -145,9 +145,9 @@ public class AddOnFragment extends Fragment {
 
     private void bindViews(View view){
         descriptionView = view.findViewById(R.id.base_description_text_view);
-        ingredientListView = view.findViewById(R.id.base_ingredient_list_view);
+        ingredientRecyclerView = view.findViewById(R.id.base_ingredient_recycler_view);
         pickIngredientButton = view.findViewById(R.id.pick_base_ingredient_button);
-        addOnListView = view.findViewById(R.id.add_on_list_view);
+        addOnRecyclerView = view.findViewById(R.id.add_on_recycler_view);
         pickAddOnButton = view.findViewById(R.id.pick_add_on_button);
         saveButton = view.findViewById(R.id.save_button);
         shelfLifeTextView = view.findViewById(R.id.shelf_life_text_view);
@@ -156,8 +156,10 @@ public class AddOnFragment extends Fragment {
     }
 
     private void updateUi(){
-        ingredientArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
-        ingredientListView.setAdapter(ingredientArrayAdapter);
+        ingredientAdapter = new MySimpleAdapter();
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
+        ingredientRecyclerView.setLayoutManager(layoutManager);
+        ingredientRecyclerView.setAdapter(ingredientAdapter);
         switch (recipeMode){
             case Create:
                 setCreateUI();
@@ -170,10 +172,10 @@ public class AddOnFragment extends Fragment {
                 break;
         }
         if (selectedBase != null && selectedBase.primaryIngredients != null){
-            ingredientArrayAdapter.addAll(selectedBase.primaryIngredients);
+            ingredientAdapter.setIngredientsNames(selectedBase.primaryIngredients);
         }
         if (selectedCompulsory != null){
-            ingredientArrayAdapter.addAll(selectedCompulsory);
+            ingredientAdapter.setIngredientsNames(selectedCompulsory);
         }
         descriptionView.setText(selectedBase.description);
         shelfLifeTextView.setText(getString(R.string.shelf_life, selectedBase.shelfLife));
@@ -183,9 +185,12 @@ public class AddOnFragment extends Fragment {
                 startPickIngredientFragment(COMPULSORY_ADD_ON);
             }
         });
-        addOnAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
-        addOnListView.setAdapter(addOnAdapter);
-        addOnAdapter.addAll(selectedOptional);
+
+        addOnAdapter = new MySimpleAdapter();
+        RecyclerView.LayoutManager addOnLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
+        ingredientRecyclerView.setLayoutManager(addOnLayoutManager);
+        addOnRecyclerView.setAdapter(addOnAdapter);
+        addOnAdapter.setIngredientsNames(selectedOptional);
         pickAddOnButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -316,17 +321,17 @@ public class AddOnFragment extends Fragment {
             if (requestCode == COMPULSORY_ADD_ON){
                 selectedCompulsory.clear();
                 selectedCompulsory.addAll(selectedIngredients);
-                ingredientArrayAdapter.clear();
+                List<String> ingredientsToDisplay = new ArrayList<>();
                 if (selectedBase.primaryIngredients != null){
-                    ingredientArrayAdapter.addAll(selectedBase.primaryIngredients);
+                    ingredientsToDisplay.addAll(selectedBase.primaryIngredients);
                 }
-                ingredientArrayAdapter.addAll(selectedCompulsory);
+                ingredientsToDisplay.addAll(selectedCompulsory);
+                ingredientAdapter.setIngredientsNames(ingredientsToDisplay);
 
             } else if (requestCode == OPTIONAL_ADD_ON){
                 selectedOptional.clear();
                 selectedOptional.addAll(selectedIngredients);
-                addOnAdapter.clear();
-                addOnAdapter.addAll(selectedOptional);
+                addOnAdapter.setIngredientsNames(selectedOptional);
 
             }
         }
@@ -383,6 +388,8 @@ public class AddOnFragment extends Fragment {
 
     private List<String> convertStringToList(String string){
         String[] stringArray = StringUtils.split(string, SEPARATOR);
+
+
         return new ArrayList<>(Arrays.asList(stringArray));
     }
 
@@ -397,8 +404,8 @@ public class AddOnFragment extends Fragment {
             outState.putParcelable(KEY_BASE, selectedBase);
             outState.putStringArrayList(KEY_SELECTED_COMPULSORY, (ArrayList<String>) selectedCompulsory);
             outState.putStringArrayList(KEY_SELECTED_OPTIONAL, (ArrayList<String>) selectedOptional);
-            outState.putParcelable(KEY_INGREDIENT_ADAPTER, ingredientListView.onSaveInstanceState());
-            outState.putParcelable(KEY_ADD_ON_ADAPTER, addOnListView.onSaveInstanceState());
+//            outState.putParcelable(KEY_INGREDIENT_ADAPTER, ingredientRecyclerView.getLayoutManager().onSaveInstanceState());
+//            outState.putParcelable(KEY_ADD_ON_ADAPTER, addOnRecyclerView.getLayoutManager().onSaveInstanceState());
         if (recipeMode == RecipeMode.Read || recipeMode == RecipeMode.Rewrite){
             outState.putInt(Repository.KEY_RECIPE_ID, recipeId);
         }

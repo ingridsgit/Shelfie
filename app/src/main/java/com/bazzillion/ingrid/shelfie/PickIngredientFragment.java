@@ -268,7 +268,7 @@ public class PickIngredientFragment extends Fragment implements IngredientPicker
                     String comma = matchingSpecBuilder.length() == 0 ? "Good for " : ", ";
                     matchingSpecBuilder.append(comma).append(specificity);
                     //TODO: when basefragment restarts after bug, PICK button is visible even though it shouldnt
-                    // + remove excels sheets from github
+                    // text view doesnt show up
                 }
             }
         }

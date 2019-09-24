@@ -35,6 +35,13 @@
 
         </FrameLayout>
 
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoText="true">
+
+        </EditText>
+
     </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
