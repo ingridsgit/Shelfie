@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.bazzillion.ingrid.shelfie.Adapters.RecipeAdapter;
 import com.bazzillion.ingrid.shelfie.Database.AppDatabase;
@@ -53,7 +54,7 @@ public class MyRecipesActivity extends DrawerActivity implements RecipeAdapter.R
                 int position = viewHolder.getAdapterPosition();
                 List<Recipe> recipes = recipeAdapter.getRecipes();
                 Repository.getInstance(MyRecipesActivity.this).deleteRecipe(recipes.get(position));
-
+                Toast.makeText(MyRecipesActivity.this, getResources().getString(R.string.deleted, recipes.get(position).getName()), Toast.LENGTH_LONG).show();
             }
         }).attachToRecyclerView(recyclerView);
     }
